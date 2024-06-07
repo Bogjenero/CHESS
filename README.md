@@ -1,7 +1,6 @@
-desna tipka na Project->Properties->Linker->Input->Additional Dependencies i unutar toga unjeti slijedeće:
-sfml-graphics-d.lib
-sfml-system-d.lib
-sfml-window-d.lib
+It should be changed under properties-> Configuration Properties -> VC++ Directories -> 
+Library Directories to the path to the lib folder.
+Also, under C/C++-> Additional Include Directions, the path to the include folder should be entered after the .zip file is unpacked when downloading the SFML library.
+Under Configuration, "All Configurations" should be selected.
 
-također pod C/C++-> Additional Include Directions treba upisati putanju do include foldera nakon što se raspakira .zip file prilikom skidanja SFML biblioteke.
-Pod Configuration treba biti odabrano "All Configurations".
+
