@@ -71,10 +71,10 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LibraryPath>D:\Borna\3.godina\2.SEMESTAR\NWP\SFML-2.6.1-windows-vc17-64-bit\SFML-2.6.1\lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>..\..\SFML-2.6.1-windows-vc17-64-bit\SFML-2.6.1\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <LibraryPath>D:\Borna\3.godina\2.SEMESTAR\NWP\SFML-2.6.1-windows-vc17-64-bit\SFML-2.6.1\lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>..\..\SFML-2.6.1-windows-vc17-64-bit\SFML-2.6.1\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
