@@ -1,88 +1,222 @@
-#include "iscrtavanje.h"
 
+#include "Iscrtavanje.h"
+#include <iostream>
 
-    sf::Texture t1, t2;
-    sf::Sprite board;
-    sf::Sprite figure;
-    sf::Sprite f[32];
-    void Inicijalizacija() {
-        t1.loadFromFile("images/board.png");
-        t2.loadFromFile("images/figures.png");
-        board.setTexture(t1);
-        figure.setTexture(t2);
-        f[0] = sf::Sprite(t2, sf::IntRect(0, 0, 60, 60));
-        f[1] = sf::Sprite(t2, sf::IntRect(50, 0,60, 58));
-        f[2] = sf::Sprite(t2, sf::IntRect(110, 0, 60, 58));
-        f[3] = sf::Sprite(t2, sf::IntRect(170, 0, 60, 58));
-        f[4] = sf::Sprite(t2, sf::IntRect(230, 0, 60, 58));
-        f[5] = sf::Sprite(t2, sf::IntRect(110, 0, 60, 58));
-        f[6] = sf::Sprite(t2, sf::IntRect(50, 0, 60, 58));
-        f[7] = sf::Sprite(t2, sf::IntRect(0, 0, 60, 58));
-
-        f[9] = sf::Sprite(t2, sf::IntRect(290, 0, 60, 58));
-        f[10] = sf::Sprite(t2, sf::IntRect(290, 0, 60, 58));
-        f[8] = sf::Sprite(t2, sf::IntRect(290, 0, 60, 58));
-        f[11] = sf::Sprite(t2, sf::IntRect(290, 0, 60, 58));
-        f[13] = sf::Sprite(t2, sf::IntRect(290, 0, 60, 58));
-        f[14] = sf::Sprite(t2, sf::IntRect(290, 0, 60, 58));
-        f[15] = sf::Sprite(t2, sf::IntRect(290, 0, 60, 58));
-        f[12] = sf::Sprite(t2, sf::IntRect(290, 0, 60, 58));       
-        
-        f[16] = sf::Sprite(t2, sf::IntRect(0, 60, 60, 60));
-        f[17] = sf::Sprite(t2, sf::IntRect(50, 60, 60, 58));
-        f[18] = sf::Sprite(t2, sf::IntRect(110, 60, 60, 58));
-        f[19] = sf::Sprite(t2, sf::IntRect(170, 60, 60, 58));
-        f[20] = sf::Sprite(t2, sf::IntRect(230, 60, 60, 58));
-        f[21] = sf::Sprite(t2, sf::IntRect(110, 60, 60, 58));
-        f[22] = sf::Sprite(t2, sf::IntRect(50, 60, 60, 58));
-        f[23] = sf::Sprite(t2, sf::IntRect(0, 60, 60, 58));
-
-        f[24] = sf::Sprite(t2, sf::IntRect(290, 60, 60, 58));
-        f[25] = sf::Sprite(t2, sf::IntRect(290, 60, 60, 58));
-        f[26] = sf::Sprite(t2, sf::IntRect(290, 60, 60, 58));
-        f[27] = sf::Sprite(t2, sf::IntRect(290, 60, 60, 58));
-        f[28] = sf::Sprite(t2, sf::IntRect(290, 60, 60, 58));
-        f[29] = sf::Sprite(t2, sf::IntRect(290, 60, 60, 58));
-        f[30] = sf::Sprite(t2, sf::IntRect(290, 60, 60, 58));
-        f[31] = sf::Sprite(t2, sf::IntRect(290, 60, 60, 58));
-
-
-        f[0].setPosition(25, 25);
-        f[1].setPosition(80, 25);
-        f[2].setPosition(140, 25);
-        f[3].setPosition(200, 25);
-        f[4].setPosition(260, 25);
-        f[5].setPosition(305, 25);
-        f[6].setPosition(360, 25);
-        f[7].setPosition(415, 25);
-        int k1 = 30;
-        for (int i = 8; i < 13; ++i)
+void chessWin::FitToHolder()
+{
+    for (int i = 0; i < 8; ++i)
+    {
+        for (int j = 0; j < 8; ++j)
         {
-            f[i].setPosition(k1, 80);
-            k1 += 60;
+            Squares[i][j].setPosition(sf::Vector2f(Holder.left + (i * Holder.width / 8), Holder.top + (j * Holder.height / 8)));
+            Squares[i][j].setSize(sf::Vector2f(Holder.width / 8, Holder.height / 8));
         }
-        f[13].setPosition(320, 80);
-        f[14].setPosition(375, 80);
-        f[15].setPosition(430, 80);
-
-
-        f[16].setPosition(25, 420);
-        f[17].setPosition(80, 420);
-        f[18].setPosition(140, 420);
-        f[19].setPosition(200, 420);
-        f[20].setPosition(260, 420);
-        f[21].setPosition(305, 420);
-        f[22].setPosition(360, 420);
-        f[23].setPosition(415, 420);
-
-        int k2 = 30;
-        for (int i = 24; i < 29; ++i)
-        {
-            f[i].setPosition(k2, 365);
-            k2 += 60;
-        }
-        f[29].setPosition(320, 365);
-        f[30].setPosition(375, 365);
-        f[31].setPosition(430, 365);
-
     }
+}
+void chessWin::DrawSquares()
+{
+    for (int i = 0; i < 8; ++i)
+    {
+        for (int j = 0; j < 8; ++j)
+        {
+            win.draw(Squares[i][j]);
+        }
+    }
+}
+void chessWin::DrawPieces()
+{
+    for (int i = 0; i < 64; ++i)
+    {
+        if (pieces[i].draw == 1)
+        {
+            win.draw(pieces[i].Sprite);
+        }
+    }
+}
+void chessWin::MapPieces()
+{
+    for (int i = 0; i < 64; ++i)
+    {
+        if (pieces[i].draw == 1)
+        {
+            pieces[i].Sprite.setPosition(sf::Vector2f(Holder.left + (pieces[i].x * Holder.width / 8), Holder.top + (pieces[i].y * Holder.height / 8)));
+            pieces[i].Sprite.setScale(Holder.width / 1600.f, Holder.height / 1600.f);
+        }
+    }
+}
+void chessWin::MapPieces(move curr)
+{
+    chessPiece* current = nullptr;
+    bool capture = false;
+    for (int i = 0; i < 64; ++i)
+    {
+        if (pieces[i].draw == 1)
+        {
+            if (pieces[i].x == curr.oX && pieces[i].y == curr.oY)
+            {
+                current = &pieces[i];
+            }
+            if (pieces[i].x == curr.X && pieces[i].y == curr.Y)
+            {
+                pieces[i].draw = 0;
+                capture = true;
+            }
+            pieces[i].Sprite.setPosition(sf::Vector2f(Holder.left + (pieces[i].x * Holder.width / 8), Holder.top + (pieces[i].y * Holder.height / 8)));
+            pieces[i].Sprite.setScale(Holder.width / 1600.f, Holder.height / 1600.f);
+        }
+    }
+    current->x = curr.X;
+    current->y = curr.Y;
+
+    current->Sprite.setPosition(sf::Vector2f(Holder.left + (current->x * Holder.width / 8), Holder.top + (current->y * Holder.height / 8)));
+    current->Sprite.setScale(Holder.width / 1600.f, Holder.height / 1600.f);
+}
+chessWin::chessWin(int width, int height, const char* name, const char* imgPath[12])
+{
+    bool sColor = 1;
+    sColors[0].r = 118;
+    sColors[0].g = 150;
+    sColors[0].b = 86;
+    sColors[1].r = 238;
+    sColors[1].g = 238;
+    sColors[1].b = 210;
+    sX = width;
+    sY = height;
+    Holder.left = 0;
+    Holder.top = 0;
+    Holder.width = width;
+    Holder.height = height;
+    for (int i = 0; i < 8; ++i)
+    {
+        for (int j = 0; j < 8; ++j)
+        {
+            Squares[i][j].setFillColor(sColors[sColor]);
+            sColor = !sColor;
+        }
+        sColor = !sColor;
+    }
+    FitToHolder();
+    sf::IntRect blank;
+    for (int i = 0; i < 12; ++i)
+    {
+        pieceTex[i].loadFromFile(imgPath[i], blank);
+    }
+    int index = 0;
+    for (int i = 0; i < 8; ++i)
+    {
+        for (int j = 0; j < 8; ++j)
+        {
+            pieces[index].pieceID = cBoard.mBoard.arr[i][j];
+            pieces[index].x = i;
+            pieces[index].y = j;
+            if (pieces[index].pieceID != -1)
+            {
+                pieces[index].Sprite.setTexture(pieceTex[pieces[index].pieceID], true);
+                pieces[index].draw = 1;
+            }
+            ++index;
+        }
+    }
+    MapPieces();
+    win.create(sf::VideoMode(width, height), name);
+}
+
+bool chessWin::Update()
+{
+    sf::Event event;
+    while (win.pollEvent(event))
+    {
+        switch (event.type)
+        {
+        case sf::Event::Resized:
+            sX = win.getSize().x;
+            sY = win.getSize().y;
+            win.setView(sf::View(sf::FloatRect(0, 0, sX, sY)));
+            if (sX > sY)
+            {
+                Holder.width = sY;
+                Holder.height = sY;
+                Holder.left = sX / 2 - Holder.width / 2;
+                Holder.top = 0;
+            }
+            else
+            {
+                Holder.width = sX;
+                Holder.height = sX;
+                Holder.top = sY / 2 - Holder.height / 2;
+                Holder.left = 0;
+            }
+            MapPieces();
+            FitToHolder();
+            break;
+        case sf::Event::MouseButtonPressed:
+            for (int i = 0; i < 8; ++i) {
+                for (int j = 0; j < 8; ++j) {
+                    std::cout << cBoard.mBoard.arr[i][j] << " ";
+                }
+                std::cout << std::endl;
+            }
+            if (event.mouseButton.button == sf::Mouse::Button::Left)
+            {
+              
+                int pX, pY;
+                pX = event.mouseButton.x;
+                pY = event.mouseButton.y;
+                int projX, projY;
+                projX = ((pX - Holder.left) - ((pX - Holder.left) % (Holder.width / 8))) / (Holder.width / 8);
+                projY = ((pY - Holder.top) - ((pY - Holder.top) % (Holder.height / 8))) / (Holder.height / 8);
+                if (cSelect == 0)
+                {
+                    if (pX >= Holder.left && pX <= Holder.left + Holder.width && pY > Holder.top && pY < Holder.top + Holder.height)
+                    {
+                        selected[0] = projX;
+                        selected[1] = projY;
+                        Squares[selected[0]][selected[1]].setFillColor(sf::Color(186, 202, 68));
+                        cSelect = 1;
+                    }
+                }
+                else
+                {
+                    if (selected[0] == projX && selected[1] == projY)
+                    {
+                        Squares[selected[0]][selected[1]].setFillColor(sColors[1 - ((selected[0] + selected[1]) % 2)]);
+                        cSelect = 0;
+                    }
+                    else
+                    {
+                        move m(selected[0], selected[1], projX, projY);
+                        if (cBoard.playMove(m))
+                        {
+                            MapPieces(m);
+                            cBoard.nextTurn();
+                        }
+                        Squares[selected[0]][selected[1]].setFillColor(sColors[1 - ((selected[0] + selected[1]) % 2)]);
+                        cSelect = 0;
+                    }
+                    for (int i = 0; i < 8; ++i) {
+                        for (int j = 0; j < 8; ++j) {
+                            std::cout << cBoard.mBoard.arr[i][j] << " ";
+                        }
+                        std::cout << std::endl;
+                    }
+                }
+
+            }
+            else if (event.mouseButton.button == sf::Mouse::Button::Right)
+            {
+                Squares[selected[0]][selected[1]].setFillColor(sColors[1 - ((selected[0] + selected[1]) % 2)]);
+                cSelect = 0;
+            }
+            break;
+        case sf::Event::Closed:
+            win.close();
+            return false;
+            break;
+        }
+    }
+    win.clear();
+    DrawSquares();
+    DrawPieces();
+    win.display();
+    return true;
+}
