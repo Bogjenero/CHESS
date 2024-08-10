@@ -8,7 +8,7 @@
 #include <iostream>
 #include <fstream>
 
-#include "Iscrtavanje.h";
+#include "Iscrtavanje.h"
 using namespace sf;
 
 
