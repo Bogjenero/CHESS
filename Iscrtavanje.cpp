@@ -3,6 +3,20 @@
 #include <iostream>
 #include <SFML/Graphics.hpp>
 
+const std::string defaultTheme[12] = {
+                                "./images/Pieces/Default/wp.png",
+                            "./images/Pieces/Default/wr.png",
+                            "./images/Pieces/Default/wn.png",
+                            "./images/Pieces/Default/wb.png",
+                            "./images/Pieces/Default/wk.png",
+                            "./images/Pieces/Default/wq.png",
+                            "./images/Pieces/Default/bp.png",
+                            "./images/Pieces/Default/br.png",
+                            "./images/Pieces/Default/bn.png",
+                            "./images/Pieces/Default/bb.png",
+                            "./images/Pieces/Default/bk.png",
+                            "./images/Pieces/Default/bq.png" };
+
 
 void chessWin::FitToHolder()
 {
@@ -39,6 +53,7 @@ void chessWin::MapPieces()
 {
     for (int i = 0; i < 64; ++i)
     {
+
         if (pieces[i].draw == 1)
         {
             pieces[i].Sprite.setPosition(sf::Vector2f(Holder.left + (pieces[i].x * Holder.width / 8), Holder.top + (pieces[i].y * Holder.height / 8)));
@@ -73,16 +88,72 @@ void chessWin::MapPieces(move curr)
     current->Sprite.setPosition(sf::Vector2f(Holder.left + (current->x * Holder.width / 8), Holder.top + (current->y * Holder.height / 8)));
     current->Sprite.setScale(Holder.width / 1600.f, Holder.height / 1600.f);
 }
-chessWin::chessWin(int width, int height, const char* name, const char* imgPath[12])
+
+
+int setTexture(Figure currFigure)
+{
+    if (currFigure.color == Figure::white)
+    {
+        if (currFigure.figure == Figure::Pawn)
+        {
+            return 0;
+        }
+        else if (currFigure.figure == Figure::Rook)
+        {
+            return 1;
+        }
+        else if (currFigure.figure == Figure::Knight)
+        {
+            return 2;
+        }
+        else if (currFigure.figure == Figure::King)
+        {
+            return 4;
+        }
+        else if (currFigure.figure == Figure::Bishop)
+        {
+            return 3;
+        }
+        else if (currFigure.figure == Figure::Queen)
+        {
+            return 5;
+        }
+    }
+    else {
+        if (currFigure.figure == Figure::Pawn)
+        {
+            return 6;
+        }
+        else if (currFigure.figure == Figure::Rook)
+        {
+            return 7;
+        }
+        else if (currFigure.figure == Figure::Knight)
+        {
+            return 8;
+        }
+        else if (currFigure.figure == Figure::King)
+        {
+            return 10;
+        }
+        else if (currFigure.figure == Figure::Bishop)
+        {
+            return 9;
+        }
+        else if (currFigure.figure == Figure::Queen)
+        {
+            return 11;
+        }
+
+    }
+}
+
+chessWin::chessWin(int width, int height, const char* name, const std::string imgPath[12])
 {
     state = GameState::StartScreen;
     bool sColor = 1;
-    sColors[0].r = 118;
-    sColors[0].g = 150;
-    sColors[0].b = 86;
-    sColors[1].r = 238;
-    sColors[1].g = 238;
-    sColors[1].b = 210;
+    sColors[0] = sf::Color(118, 150, 86);
+    sColors[1] = sf::Color(238, 238, 210);
     sX = width;
     sY = height;
     Holder.left = 0;
@@ -124,13 +195,14 @@ chessWin::chessWin(int width, int height, const char* name, const char* imgPath[
         for (int j = 0; j < 8; ++j)
         {
             Figure currFigure = cBoard.mBoard.arr[i][j];
+            
             pieces[index].pieceID.figure = currFigure.figure;
             pieces[index].pieceID.color = currFigure.color;
             pieces[index].x = i;
             pieces[index].y = j;
             if (currFigure.figure != Figure::Empty)
             {
-                int textureIndex = (currFigure.color == Figure::white ? 0 : 6) + static_cast<int>(currFigure.figure);
+                int textureIndex = setTexture(currFigure);
                 pieces[index].Sprite.setTexture(pieceTex[textureIndex], true);
                 pieces[index].draw = 1;
             }
@@ -171,6 +243,7 @@ void chessWin::handleMouseButtonPressed(sf::Event& event) {
         if (state == GameState::StartScreen) {
             if (button.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
                 state = GameState::ChessBoard;
+                
                 MapPieces();
             }
         }
@@ -215,6 +288,114 @@ void chessWin::handleClosed() {
 }
 
 
+void chessWin::resetGame() {
+    // Resetiranje ploče na početno stanje
+    for (int i = 0; i < 8; ++i) {
+        for (int j = 0; j < 8; ++j) {
+            cBoard.mBoard.arr[i][j] = cBoard.mBoard.start[i][j];
+        }
+    }
+
+    // Ponovno učitavanje slika figura prema početnom stanju
+    int index = 0;
+    for (int i = 0; i < 8; ++i) {
+        for (int j = 0; j < 8; ++j) {
+            Figure currFigure = cBoard.mBoard.arr[i][j];
+
+            pieces[index].pieceID.figure = currFigure.figure;
+            pieces[index].pieceID.color = currFigure.color;
+            pieces[index].x = i;
+            pieces[index].y = j;
+            if (currFigure.figure != Figure::Empty) {
+                int textureIndex = setTexture(currFigure);
+                pieces[index].Sprite.setTexture(pieceTex[textureIndex], true);
+                pieces[index].draw = 1;
+            }
+            else {
+                pieces[index].draw = 0;
+            }
+            ++index;
+        }
+    }
+
+    // Ažuriraj prikaz figura
+    MapPieces();
+    FitToHolder();
+}
+
+
+void chessWin::showEndWindow()
+{
+    
+    sf::RenderWindow endWindow(sf::VideoMode(400, 200), "End Window");
+
+    
+    sf::RectangleShape button(sf::Vector2f(250, 50));
+    button.setFillColor(sf::Color::Green);
+    button.setPosition(100, 75);
+
+    
+    sf::Font font;
+    if (!font.loadFromFile("C:\\Windows\\Fonts\\arial.ttf")) 
+    {
+        return; 
+    }
+
+    sf::Text buttonText("Finish the game", font, 24);
+    buttonText.setFillColor(sf::Color::White);
+    buttonText.setPosition(150, 85); 
+
+   
+    while (endWindow.isOpen())
+    {
+        sf::Event event;
+        while (endWindow.pollEvent(event))
+        {
+            if (event.type == sf::Event::Closed)
+            {
+                endWindow.close();
+            }
+            else if (event.type == sf::Event::MouseButtonPressed)
+            {
+                if (event.mouseButton.button == sf::Mouse::Left)
+                {
+                    sf::Vector2i mousePos = sf::Mouse::getPosition(endWindow);
+                    if (button.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
+                        // Zatvori trenutni prozor igre
+                        win.close();
+
+                        // Resetiraj igru
+                        resetGame();
+
+                        // Postavi stanje igre na početni ekran
+                        state = GameState::StartScreen;
+
+                        // Ponovno otvorite glavni prozor igre
+                        win.create(sf::VideoMode(sX, sY), "chess");
+
+                        // Inicijalizacija i prikaz početnog ekrana
+                        FitToHolder();
+                        MapPieces();
+                        DrawSquares();
+                        DrawPieces();
+
+                        // Izađite iz petlje
+                        return;
+                    }
+                }
+            }
+        }
+
+        endWindow.clear();
+        endWindow.draw(button);
+        endWindow.draw(buttonText);
+        endWindow.display();
+    }
+}
+
+
+
+
 bool chessWin::Update() {
     sf::Event event;
     while (win.pollEvent(event)) {
@@ -233,6 +414,12 @@ bool chessWin::Update() {
             return false;
 
             // Možeš dodati druge evente ovdje, ako su potrebni
+
+        case sf::Event::KeyPressed:
+            if (event.key.code == sf::Keyboard::Escape && state == GameState::ChessBoard)
+            {
+                showEndWindow();
+            }
         }
     }
 

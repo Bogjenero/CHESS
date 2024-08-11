@@ -15,7 +15,7 @@ using namespace sf;
 int main()
 {
 
-	const char* defaultTheme[12] = { 
+	const std::string defaultTheme[12] = { 
 									"./images/Pieces/Default/wp.png",
 								"./images/Pieces/Default/wr.png",
 								"./images/Pieces/Default/wn.png",

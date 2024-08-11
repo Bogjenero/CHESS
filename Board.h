@@ -40,6 +40,16 @@ struct board
             {{Figure::Bishop, Figure::black}, {Figure::Pawn, Figure::black}, {Figure::Empty, Figure::none}, {Figure::Empty, Figure::none}, {Figure::Empty, Figure::none}, {Figure::Empty, Figure::none}, {Figure::Pawn, Figure::white}, {Figure::Bishop, Figure::white}},
             {{Figure::Knight, Figure::black}, {Figure::Pawn, Figure::black}, {Figure::Empty, Figure::none}, {Figure::Empty, Figure::none}, {Figure::Empty, Figure::none}, {Figure::Empty, Figure::none}, {Figure::Pawn, Figure::white}, {Figure::Knight, Figure::white}},
             {{Figure::Rook, Figure::black}, {Figure::Pawn, Figure::black}, {Figure::Empty, Figure::none}, {Figure::Empty, Figure::none}, {Figure::Empty, Figure::none}, {Figure::Empty, Figure::none}, {Figure::Pawn, Figure::white}, {Figure::Rook, Figure::white}}
+        };        
+        Figure start[8][8] = {
+            {{Figure::Rook, Figure::black}, {Figure::Pawn, Figure::black}, {Figure::Empty, Figure::none}, {Figure::Empty, Figure::none}, {Figure::Empty, Figure::none}, {Figure::Empty, Figure::none}, {Figure::Pawn, Figure::white}, {Figure::Rook, Figure::white}},
+            {{Figure::Knight, Figure::black}, {Figure::Pawn, Figure::black}, {Figure::Empty, Figure::none}, {Figure::Empty, Figure::none}, {Figure::Empty, Figure::none}, {Figure::Empty, Figure::none}, {Figure::Pawn, Figure::white}, {Figure::Knight, Figure::white}},
+            {{Figure::Bishop, Figure::black}, {Figure::Pawn, Figure::black}, {Figure::Empty, Figure::none}, {Figure::Empty, Figure::none}, {Figure::Empty, Figure::none}, {Figure::Empty, Figure::none}, {Figure::Pawn, Figure::white}, {Figure::Bishop, Figure::white}},
+            {{Figure::King, Figure::black}, {Figure::Pawn, Figure::black}, {Figure::Empty, Figure::none}, {Figure::Empty, Figure::none}, {Figure::Empty, Figure::none}, {Figure::Empty, Figure::none}, {Figure::Pawn, Figure::white}, {Figure::King, Figure::white}},
+            {{Figure::Queen, Figure::black}, {Figure::Pawn, Figure::black}, {Figure::Empty, Figure::none}, {Figure::Empty, Figure::none}, {Figure::Empty, Figure::none}, {Figure::Empty, Figure::none}, {Figure::Pawn, Figure::white}, {Figure::Queen, Figure::white}},
+            {{Figure::Bishop, Figure::black}, {Figure::Pawn, Figure::black}, {Figure::Empty, Figure::none}, {Figure::Empty, Figure::none}, {Figure::Empty, Figure::none}, {Figure::Empty, Figure::none}, {Figure::Pawn, Figure::white}, {Figure::Bishop, Figure::white}},
+            {{Figure::Knight, Figure::black}, {Figure::Pawn, Figure::black}, {Figure::Empty, Figure::none}, {Figure::Empty, Figure::none}, {Figure::Empty, Figure::none}, {Figure::Empty, Figure::none}, {Figure::Pawn, Figure::white}, {Figure::Knight, Figure::white}},
+            {{Figure::Rook, Figure::black}, {Figure::Pawn, Figure::black}, {Figure::Empty, Figure::none}, {Figure::Empty, Figure::none}, {Figure::Empty, Figure::none}, {Figure::Empty, Figure::none}, {Figure::Pawn, Figure::white}, {Figure::Rook, Figure::white}}
         };
 };
 

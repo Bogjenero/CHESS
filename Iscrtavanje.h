@@ -44,11 +44,12 @@ private:
 	void handleResized(); // Nova funkcija za rukovanje promjenom veličine prozora
 	void handleMouseButtonPressed(sf::Event& event); // Nova funkcija za rukovanje pritiskom tipke miša
 	void handleClosed(); // Nova funkcija za rukovanje zatvaranjem prozora
-	
+	void showEndWindow();
+	void resetGame();
 public:
 	chessBoard cBoard; //šahovska ploča
 	bool Update();// rukuje događajima koji su izvedeni na prozoru
-	chessWin(int width, int height, const char* name, const char* imgPath[12]); 
+	chessWin(int width, int height, const char* name, const std::string imgPath[12]); 
 
 };
 
