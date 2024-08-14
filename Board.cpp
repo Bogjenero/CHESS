@@ -2,9 +2,9 @@
 #include <vector>
 #include "Board.h"
 #include <iostream>
+#include <algorithm>
 
 
-bool wKing_moved, bKing_moved, wRook1_moved, wRook2_moved, bRook1_moved, bRook2_moved = false;
 
 move::move(int oldX, int oldY, int newX, int newY)
 {
@@ -14,65 +14,34 @@ move::move(int oldX, int oldY, int newX, int newY)
     Y = newY;
 }
 
-/*void chessBoard::Pawn(std::vector<move>& moves, int x, int y)
+void chessBoard::Pawn(board Board,std::vector<move>& moves, int x, int y)
 {
-    if (mBoard.arr[x][y].figure == Figure::Pawn && mBoard.arr[x][y].color == turn)
-    {
-        if (y > 0)
-        {
-            if (mBoard.arr[x][y - 1].figure == Figure::Empty)
-            {
-                moves.push_back(move(x, y, x, y - 1));
-                if (mBoard.arr[x][y - 2].figure == Figure::Empty && y == 6)
-                {
-                    moves.push_back(move(x, y, x, y - 2));
-                }
-            }
-            if (x > 0)
-            {
-                if (mBoard.arr[x - 1][y - 1].figure >= Figure::Pawn && mBoard.arr[x - 1][y - 1].figure <= Figure::Queen && mBoard.arr[x - 1][y - 1].color >= Figure::black)
-                {
-                    moves.push_back(move(x, y, x - 1, y - 1));
-                }
-            }
-            if (x < 7)
-            {
-                if (mBoard.arr[x - 1][y - 1].figure >= Figure::Pawn  && mBoard.arr[x - 1][y - 1].figure <= Figure::Queen && mBoard.arr[x - 1][y - 1].color == Figure::black )
-                {
-                    moves.push_back(move(x, y, x + 1, y - 1));
-                }
-            }
-        }
-    }
-}*/
-void chessBoard::Pawn(std::vector<move>& moves, int x, int y)
-{
-    if (mBoard.arr[x][y].figure == Figure::Pawn && mBoard.arr[x][y].color == turn)
+    if (Board.arr[x][y].figure == Figure::Pawn && Board.arr[x][y].color == turn)
     {
         int direction = (turn == Figure::white) ? -1 : 1; 
         int startRow = (turn == Figure::white) ? 6 : 1;   
         int opponentColor = (turn == Figure::white) ? Figure::black : Figure::white;
 
 
-        if (y + direction >= 0 && y + direction < 8 && mBoard.arr[x][y + direction].figure == Figure::Empty)
+        if (y + direction >= 0 && y + direction < 8 && Board.arr[x][y + direction].figure == Figure::Empty)
         {
             moves.push_back(move(x, y, x, y + direction));
 
-            if (y == startRow && mBoard.arr[x][y + 2 * direction].figure == Figure::Empty)
+            if (y == startRow && Board.arr[x][y + 2 * direction].figure == Figure::Empty)
             {
                 moves.push_back(move(x, y, x, y + 2 * direction));
             }
         }
         if (x > 0 && y + direction >= 0 && y + direction < 8)
         {
-            if (mBoard.arr[x - 1][y + direction].color == opponentColor && mBoard.arr[x - 1][y + direction].figure != Figure::Empty)
+            if (Board.arr[x - 1][y + direction].color == opponentColor && Board.arr[x - 1][y + direction].figure != Figure::Empty)
             {
                 moves.push_back(move(x, y, x - 1, y + direction));
             }
         }
         if (x < 7 && y + direction >= 0 && y + direction < 8)
         {
-            if (mBoard.arr[x + 1][y + direction].color == opponentColor && mBoard.arr[x + 1][y + direction].figure != Figure::Empty)
+            if (Board.arr[x + 1][y + direction].color == opponentColor && Board.arr[x + 1][y + direction].figure != Figure::Empty)
             {
                 moves.push_back(move(x, y, x + 1, y + direction));
             }
@@ -80,11 +49,12 @@ void chessBoard::Pawn(std::vector<move>& moves, int x, int y)
     }
 }
 
-void chessBoard::King(std::vector<move>& moves, int x, int y)
+void chessBoard::King(board Board, std::vector<move>& moves, int x, int y)
 {
-    if (mBoard.arr[x][y].figure == Figure::King)
-    {
 
+    if (Board.arr[x][y].figure != Figure::King)
+        return;
+    
         int dx[] = { -1, -1, -1, 0, 0, 1, 1, 1, -3,2 };
         int dy[] = { -1, 0, 1, -1, 1, -1, 0, 1, 0,0};
 
@@ -97,32 +67,43 @@ void chessBoard::King(std::vector<move>& moves, int x, int y)
             if (newX >= 0 && newX < 8 && newY >= 0 && newY < 8)
             {
                 
-                if (mBoard.arr[newX][newY].color != mBoard.arr[x][y].color || mBoard.arr[newX][newY].figure == Figure::Empty)
+                if (Board.arr[newX][newY].color != Board.arr[x][y].color || Board.arr[newX][newY].figure == Figure::Empty)
                 {
                     moves.push_back(move(x, y, newX, newY));
                 }
             }
         }
-        if(mBoard.arr[x][y].color == Figure::white && !wKing_moved)
+        if(Board.arr[x][y].color == Figure::white && !wKing_moved)
 		{
+            if (Board.arr[x + 2][y].figure == Figure::Empty && Board.arr[x + 1][y].figure == Figure::Empty)
+            {
                 moves.push_back(move(x, y, x + 2, y));
+            }
+            if(Board.arr[x - 3][y].figure == Figure::Empty && Board.arr[x - 1][y].figure == Figure::Empty && Board.arr[x - 2][y].figure == Figure::Empty)
+            {
                 moves.push_back(move(x, y, x - 3, y));
+            }
 		}
-        else if(mBoard.arr[x][y].color == Figure::black && !bKing_moved)
+        else if(Board.arr[x][y].color == Figure::black && !bKing_moved)
 		{
-            moves.push_back(move(x, y, x + 2, y));
-            moves.push_back(move(x, y, x - 3, y));
+            if (Board.arr[x + 2][y].figure == Figure::Empty && Board.arr[x + 1][y].figure == Figure::Empty)
+            {
+                moves.push_back(move(x, y, x + 2, y));
+            }
+            if (Board.arr[x - 3][y].figure == Figure::Empty && Board.arr[x - 1][y].figure == Figure::Empty && Board.arr[x - 2][y].figure == Figure::Empty)
+            {
+                moves.push_back(move(x, y, x - 3, y));
+            }
 		}
-
-    }
 }
 
 
-void chessBoard::Knight(std::vector<move>& moves, int x, int y)
+void chessBoard::Knight(board Board, std::vector<move>& moves, int x, int y)
 {
-    if (mBoard.arr[x][y].figure == Figure::Knight)
-    {
-        
+
+    if (Board.arr[x][y].figure != Figure::Knight)
+        return;
+
         int dx[] = { -2, -1, 1, 2, 2, 1, -1, -2 };
         int dy[] = { 1, 2, 2, 1, -1, -2, -2, -1 };
 
@@ -135,19 +116,20 @@ void chessBoard::Knight(std::vector<move>& moves, int x, int y)
             if (newX >= 0 && newX < 8 && newY >= 0 && newY < 8)
             {
                
-                if (mBoard.arr[newX][newY].color != mBoard.arr[x][y].color || mBoard.arr[newX][newY].figure == Figure::Empty)
+                if (Board.arr[newX][newY].color != Board.arr[x][y].color || Board.arr[newX][newY].figure == Figure::Empty)
                 {
                     moves.push_back(move(x, y, newX, newY));
                 }
             }
         }
-    }
 }
 
-void chessBoard::Rook(std::vector<move>& moves, int x, int y)
+void chessBoard::Rook(board Board, std::vector<move>& moves, int x, int y)
 {
-    if (mBoard.arr[x][y].figure == Figure::Rook)
-    {
+
+    if (Board.arr[x][y].figure != Figure::Rook)
+        return;
+
         int dx[] = { 1, -1, 0, 0 };
         int dy[] = { 0, 0, 1, -1 };
 
@@ -164,11 +146,11 @@ void chessBoard::Rook(std::vector<move>& moves, int x, int y)
                 {
                     break;
                 }
-                if (mBoard.arr[newX][newY].figure == Figure::Empty)
+                if (Board.arr[newX][newY].figure == Figure::Empty)
                 {
                     moves.push_back(move(x, y, newX, newY));
                 }
-                else if (mBoard.arr[newX][newY].color != mBoard.arr[x][y].color)
+                else if (Board.arr[newX][newY].color != Board.arr[x][y].color)
                 {
                     moves.push_back(move(x, y, newX, newY));
                     break;
@@ -180,16 +162,17 @@ void chessBoard::Rook(std::vector<move>& moves, int x, int y)
             }
         }
     }
-}
 
 
 
 
 
-void chessBoard::Bishop(std::vector<move>& moves, int x, int y)
+
+void chessBoard::Bishop(board Board, std::vector<move>& moves, int x, int y)
 {
-    if (mBoard.arr[x][y].figure == Figure::Bishop)
-    {
+
+    if (Board.arr[x][y].figure != Figure::Bishop)
+        return;
         int dx[] = { 1, 1, -1, -1 };
         int dy[] = { 1, -1, 1, -1 };
 
@@ -208,11 +191,11 @@ void chessBoard::Bishop(std::vector<move>& moves, int x, int y)
                 {
                     break;
                 }
-                if (mBoard.arr[newX][newY].figure == Figure::Empty)
+                if (Board.arr[newX][newY].figure == Figure::Empty)
                 {
                     moves.push_back(move(x, y, newX, newY));
                 }
-                else if (mBoard.arr[newX][newY].color != mBoard.arr[x][y].color)
+                else if (Board.arr[newX][newY].color != Board.arr[x][y].color)
                 {
                     moves.push_back(move(x, y, newX, newY));
                     break;
@@ -224,11 +207,12 @@ void chessBoard::Bishop(std::vector<move>& moves, int x, int y)
             }
         }
     }
-}
-void chessBoard::Queen(std::vector<move>& moves, int x, int y)
+
+void chessBoard::Queen(board Board, std::vector<move>& moves, int x, int y)
 {
-    if (mBoard.arr[x][y].figure == Figure::Queen)
-    {
+
+    if (Board.arr[x][y].figure != Figure::Queen)
+        return;
         
         for (int dx = -1; dx <= 1; ++dx)
         {
@@ -247,7 +231,7 @@ void chessBoard::Queen(std::vector<move>& moves, int x, int y)
                         break;
                     }
 
-                    auto& targetSquare = mBoard.arr[nx][ny];
+                    auto& targetSquare = Board.arr[nx][ny];
                     if (targetSquare.figure == Figure::Empty)
                     {
                         moves.push_back(move(x, y, nx, ny));
@@ -255,7 +239,7 @@ void chessBoard::Queen(std::vector<move>& moves, int x, int y)
                     else
                     {
                        
-                        if ((targetSquare.color != mBoard.arr[x][y].color) &&
+                        if ((targetSquare.color != Board.arr[x][y].color) &&
                             (targetSquare.figure >= Figure::Pawn && targetSquare.figure <= Figure::Queen))
                         {
                             moves.push_back(move(x, y, nx, ny));
@@ -284,7 +268,7 @@ void chessBoard::Queen(std::vector<move>& moves, int x, int y)
                             break;
                         }
 
-                        auto& targetSquare = mBoard.arr[nx][ny];
+                        auto& targetSquare = Board.arr[nx][ny];
                         if (targetSquare.figure == Figure::Empty)
                         {
                             moves.push_back(move(x, y, nx, ny));
@@ -292,7 +276,7 @@ void chessBoard::Queen(std::vector<move>& moves, int x, int y)
                         else
                         {
                             
-                            if ((targetSquare.color != mBoard.arr[x][y].color) &&
+                            if ((targetSquare.color != Board.arr[x][y].color) &&
                                 (targetSquare.figure >= Figure::Pawn && targetSquare.figure <= Figure::Queen))
                             {
                                 moves.push_back(move(x, y, nx, ny));
@@ -304,7 +288,6 @@ void chessBoard::Queen(std::vector<move>& moves, int x, int y)
             }
         }
     }
-}
 
 
 
@@ -319,29 +302,29 @@ std::vector<move> chessBoard::getLegalMoves(board b, Figure::Colors color)
         {
                 if (b.arr[i][j].figure == Figure::Pawn && b.arr[i][j].color == color)
                 {
-                    Pawn(moves, i, j);
+                    Pawn(b,moves, i, j);
                 }
                 else if (b.arr[i][j].figure == Figure::King && b.arr[i][j].color == color)
                 {
-                    King(moves, i, j);
+                    King(b,moves, i, j);
                     b.arr[i][j].hasMoved = true;
                 }
                 if (b.arr[i][j].figure == Figure::Knight && b.arr[i][j].color == color)
                 {
-                    Knight(moves, i, j);
+                    Knight(b,moves, i, j);
                 }
                 else if (b.arr[i][j].figure == Figure::Rook && b.arr[i][j].color == color)
                 {
-                    Rook(moves, i, j);
+                    Rook(b,moves, i, j);
                     b.arr[i][j].hasMoved = true;
                 }
                 else if (b.arr[i][j].figure == Figure::Bishop && b.arr[i][j].color == color)
                 {
-                    Bishop(moves, i, j);
+                    Bishop(b,moves, i, j);
                 }
                 else if (b.arr[i][j].figure == Figure::Queen && b.arr[i][j].color == color)
                 {
-                    Queen(moves, i, j);
+                    Queen(b,moves, i, j);
                 }
         }
     }
@@ -349,76 +332,80 @@ std::vector<move> chessBoard::getLegalMoves(board b, Figure::Colors color)
 }
 
 
-bool chessBoard::isKingInCheck(board b,Figure::Colors turn)
+bool chessBoard::isKingInCheck(board b,Figure::Colors color)
 {
-        int kingX, kingY;
-        for (int i = 0; i < 8; ++i)
+    int kingX, kingY;
+    for (int i = 0; i < 8; ++i)
+    {
+        for (int j = 0; j < 8; ++j)
         {
-            for (int j = 0; j < 8; ++j)
+            if (b.arr[i][j].figure == Figure::King && b.arr[i][j].color == color)
             {
-                if (mBoard.arr[i][j].figure == Figure::King && mBoard.arr[i][j].color == turn)
-                {
-                    kingX = i;
-                    kingY = j;
-                    break;
-                }
+                kingX = i;
+                kingY = j;
+                break;
             }
         }
-        for (int i = 0; i < 8; ++i)
-        {
-            for (int j = 0; j < 8; ++j)
-            {
-                if (mBoard.arr[i][j].color != turn && mBoard.arr[i][j].color != Figure::none)
-                {
-                    std::vector<move> opponentMoves;
-                    switch (mBoard.arr[i][j].figure)
-                    {
-                    case Figure::Pawn:
-                        Pawn(opponentMoves, i, j);
-                        break;
-                    case Figure::Knight:
-                        Knight(opponentMoves, i, j);
-                        break;
-                    case Figure::Bishop:
-                        Bishop(opponentMoves, i, j);
-                        break;
-                    case Figure::Rook:
-                        Rook(opponentMoves, i, j);
-                        break;
-                    case Figure::Queen:
-                        Queen(opponentMoves, i, j);
-                        break;
-                    case Figure::King:
-                        King(opponentMoves, i, j);
-                        break;
-                    default:
-                        break;
-                    }
+    }
+    std::vector<move> opponentMoves;
+    if (color == Figure::white) 
+    {
+         opponentMoves = getLegalMoves(b, Figure::black);
+    }
+    else 
+    {
+		 opponentMoves = getLegalMoves(b, Figure::white);
+	}
 
-                    
-                    for (const auto& m : opponentMoves)
-                    {
-                        if (m.X == kingX && m.Y == kingY)
-                        {
-                            return true; 
-                        }
-                    }
-                }
-            }
+    bool kingInCheck = false;
+    std::for_each(opponentMoves.begin(), opponentMoves.end(), [&](const move& m) {
+        if (m.X == kingX && m.Y == kingY) {
+            kingInCheck = true; 
         }
-    return false; 
+        });
+
+    return kingInCheck;
 }
+
+bool chessBoard::isCheckmate(board b, Figure::Colors color) {
+    
+    if (!isKingInCheck(b, color)) {
+        return false; 
+    }
+
+    std::vector<move> allPossibleMoves = getLegalMoves(b, color);
+
+    bool isCheckmate = true;
+
+    std::for_each(allPossibleMoves.begin(), allPossibleMoves.end(), [&](const move& m) {
+        board tempBoard = b;
+
+        
+        tempBoard.arr[m.X][m.Y] = tempBoard.arr[m.oX][m.oY];
+        tempBoard.arr[m.oX][m.oY] = { Figure::Empty, Figure::none };
+
+        
+        if (!isKingInCheck(tempBoard, color)) {
+            isCheckmate = false;
+        }
+    });
+
+    
+    return isCheckmate;
+}
+
+
 
 
 bool chessBoard::isSquareUnderAttack(int x, int y)
 {
     std::vector<move> moves;
-    if (isKingInCheck(mBoard,turn))
+    if (isKingInCheck(chessBoard,turn))
     {
         return false;
     }
     if (turn == Figure::white) {
-        std::vector<move> moves = getLegalMoves(mBoard, Figure::black);
+        std::vector<move> moves = getLegalMoves(chessBoard, Figure::black);
         for (const auto& m : moves)
         {
             if (m.X == x && m.Y == y)
@@ -426,9 +413,15 @@ bool chessBoard::isSquareUnderAttack(int x, int y)
                 return false;
             }
         }
+        std::for_each(moves.begin(), moves.end(), [&](const auto& m) {
+            if (m.X == x && m.Y == y)
+            {
+                return false;
+            }
+            });
     }
     else {
-        std::vector<move> moves = getLegalMoves(mBoard, Figure::white);
+        std::vector<move> moves = getLegalMoves(chessBoard, Figure::white);
         for (const auto& m : moves)
         {
             if (m.X == x && m.Y == y)
@@ -441,80 +434,39 @@ bool chessBoard::isSquareUnderAttack(int x, int y)
     return true;
 }
 
-bool chessBoard::isCheckmate(board b, Figure::Colors turn) {
-    if (!isKingInCheck(b, turn)) {
-        return false;
-    }
-
-    for (int i = 0; i < 8; ++i) {
-        for (int j = 0; j < 8; ++j) {
-            if (mBoard.arr[i][j].color == turn) {
-                std::vector<move> possibleMoves;
-                switch (mBoard.arr[i][j].figure) {
-                case Figure::Pawn:
-                    Pawn(possibleMoves, i, j);
-                    break;
-                case Figure::Knight:
-                    Knight(possibleMoves, i, j);
-                    break;
-                case Figure::Bishop:
-                    Bishop(possibleMoves, i, j);
-                    break;
-                case Figure::Rook:
-                    Rook(possibleMoves, i, j);
-                    break;
-                case Figure::Queen:
-                    Queen(possibleMoves, i, j);
-                    break;
-                case Figure::King:
-                    King(possibleMoves, i, j);
-                    break;
-                default:
-                    break;
-                }
-                for (const auto& m : possibleMoves) {
-                    board tempBoard = b;
-                    tempBoard.arr[m.X][m.Y] = tempBoard.arr[m.oX][m.oY];
-                    tempBoard.arr[m.oX][m.oY] = { Figure::Empty, Figure::none };
-
-                    if (!isKingInCheck(tempBoard, turn)) {
-                        return false;
-                    }
-                }
-            }
-        }
-    }
-
-    return true;
-}
 
 
 
 
 
-bool chessBoard::playMove(move req,int replace[],bool end[])
+
+
+
+
+bool chessBoard::playMove(move req,int replace[],bool& end,bool& rotation)
 {
 
  
-    std::vector<move> moves = getLegalMoves(mBoard, turn);
+    std::vector<move> moves = getLegalMoves(chessBoard, turn);
     move temp;
     for (int i = 0; i < moves.size(); ++i)
     {
         temp = moves[i];
         
-        if (temp.oX == req.oX && temp.oY == req.oY && temp.X == req.X && temp.Y == req.Y)
+        if (req==moves[i])
         {
-            if (mBoard.arr[req.oX][req.oY].figure == Figure::King && mBoard.arr[req.oX][req.oY].color == Figure::white && req.oX + 2 == temp.X && !wKing_moved && !wRook2_moved)
+            if (chessBoard.arr[req.oX][req.oY].figure == Figure::King && chessBoard.arr[req.oX][req.oY].color == Figure::white && req.oX + 2 == temp.X && !wKing_moved && !wRook2_moved)
             {
                 if (isSquareUnderAttack(req.oX + 2, req.oY) && isSquareUnderAttack(req.oX + 1, req.Y))
                 {
-                    mBoard.arr[req.X][req.Y] = mBoard.arr[req.oX][req.oY];
-                    mBoard.arr[req.oX][req.oY].figure = Figure::Empty;
-                    mBoard.arr[5][7] = mBoard.arr[7][7];
-                    mBoard.arr[7][7].figure = Figure::Empty;
+                    chessBoard.arr[req.X][req.Y] = chessBoard.arr[req.oX][req.oY];
+                    chessBoard.arr[req.oX][req.oY].figure = Figure::Empty;
+                    chessBoard.arr[5][7] = chessBoard.arr[7][7];
+                    chessBoard.arr[7][7].figure = Figure::Empty;
                     wKing_moved = true;
                     wRook2_moved = true;
-                    replace[0] = 1, replace[1] = 7, replace[2] = 7, replace[3] = 5, replace[4] = 7;               
+                    replace[0] = 7, replace[1] = 7, replace[2] = 5, replace[3] = 7;               
+                    rotation = true;
                 }
                 else {
                     return false;
@@ -522,86 +474,79 @@ bool chessBoard::playMove(move req,int replace[],bool end[])
                 }
             }
 
-            else if (mBoard.arr[req.oX][req.oY].figure == Figure::King && mBoard.arr[req.oX][req.oY].color == Figure::white && req.oX - 3 == temp.X && !wKing_moved && !wRook1_moved)
+            else if (chessBoard.arr[req.oX][req.oY].figure == Figure::King && chessBoard.arr[req.oX][req.oY].color == Figure::white && req.oX - 3 == temp.X && !wKing_moved && !wRook1_moved)
             {
                 if(isSquareUnderAttack(req.oX-3, req.oY) && isSquareUnderAttack(req.oX-2, req.oY) && isSquareUnderAttack(req.oX-1, req.oY))
                 {
-                    mBoard.arr[req.X][req.Y] = mBoard.arr[req.oX][req.oY];
-                    mBoard.arr[2][7] = mBoard.arr[0][7];
-                    mBoard.arr[req.oX][req.oY].figure = Figure::Empty;
-                    mBoard.arr[0][7].figure = Figure::Empty;
+                    chessBoard.arr[req.X][req.Y] = chessBoard.arr[req.oX][req.oY];
+                    chessBoard.arr[2][7] = chessBoard.arr[0][7];
+                    chessBoard.arr[req.oX][req.oY].figure = Figure::Empty;
+                    chessBoard.arr[0][7].figure = Figure::Empty;
                     wKing_moved = true;
                     wRook1_moved = true;
-                    replace[0] = 1, replace[1] = 0, replace[2] = 7, replace[3] = 2, replace[4] = 7;
+                    replace[0] = 0, replace[1] = 7, replace[2] = 2, replace[3] = 7;
+                    rotation = true;
                 }
                 else {
                     return false;   
                 }
             }
-            else if (mBoard.arr[req.oX][req.oY].figure == Figure::King && mBoard.arr[req.oX][req.oY].color == Figure::black && req.oX + 2 == temp.X && !bKing_moved && !bRook1_moved)
+            else if (chessBoard.arr[req.oX][req.oY].figure == Figure::King && chessBoard.arr[req.oX][req.oY].color == Figure::black && req.oX + 2 == temp.X && !bKing_moved && !bRook1_moved)
             {
                 if (isSquareUnderAttack(req.oX+1, req.oY) && isSquareUnderAttack(req.oX + 2, req.oY))
                 {
-                    mBoard.arr[req.X][req.Y] = mBoard.arr[req.oX][req.oY];
-                    mBoard.arr[5][0] = mBoard.arr[7][0];
-                    mBoard.arr[req.oX][req.oY].figure = Figure::Empty;
-                    mBoard.arr[7][0].figure = Figure::Empty;
+                    chessBoard.arr[req.X][req.Y] = chessBoard.arr[req.oX][req.oY];
+                    chessBoard.arr[5][0] = chessBoard.arr[7][0];
+                    chessBoard.arr[req.oX][req.oY].figure = Figure::Empty;
+                    chessBoard.arr[7][0].figure = Figure::Empty;
                     bKing_moved = true;
                     bRook1_moved = true;
-                    replace[0] = 1, replace[1] = 7, replace[2] = 0, replace[3] = 5, replace[4] = 0;
+                    replace[0] = 7, replace[1] = 0, replace[2] = 5, replace[3] = 0;
+                    rotation = true;
                 }
                 else {
                     return false;
                 }
             }
-            else if (mBoard.arr[req.oX][req.oY].figure == Figure::King && mBoard.arr[req.oX][req.oY].color == Figure::black && req.oX - 3 == temp.X && !bKing_moved && !wRook2_moved)
+            else if (chessBoard.arr[req.oX][req.oY].figure == Figure::King && chessBoard.arr[req.oX][req.oY].color == Figure::black && req.oX - 3 == temp.X && !bKing_moved && !wRook2_moved)
             {
                 if (isSquareUnderAttack(req.oX - 3, req.oY) && isSquareUnderAttack(req.oX - 2, req.oY) && isSquareUnderAttack(req.oX-3, req.oY))
                 {
-                    mBoard.arr[req.X][req.Y] = mBoard.arr[req.oX][req.oY];
-                    mBoard.arr[2][0] = mBoard.arr[0][0];
-                    mBoard.arr[req.oX][req.oY].figure = Figure::Empty;
-                    mBoard.arr[0][0].figure = Figure::Empty;
+                    chessBoard.arr[req.X][req.Y] = chessBoard.arr[req.oX][req.oY];
+                    chessBoard.arr[2][0] = chessBoard.arr[0][0];
+                    chessBoard.arr[req.oX][req.oY].figure = Figure::Empty;
+                    chessBoard.arr[0][0].figure = Figure::Empty;
                     bKing_moved = true;
                     bRook2_moved = true;
-                    replace[0] = 1, replace[1] = 0, replace[2] = 0, replace[3] = 2, replace[4] = 0;
+                    replace[0] = 0, replace[1] = 0, replace[2] = 2, replace[3] = 0;
+                    rotation = true;
                 }
                 else {
                     return false;
                 }
-
             }
             else {
-                mBoard.arr[req.X][req.Y] = mBoard.arr[req.oX][req.oY];
-                mBoard.arr[req.oX][req.oY] = { Figure::Empty, Figure::none };
+                chessBoard.arr[req.X][req.Y] = chessBoard.arr[req.oX][req.oY];
+                chessBoard.arr[req.oX][req.oY] = { Figure::Empty, Figure::none };
 
             }
             bool check = false;
-        
-            if(isKingInCheck(mBoard,turn))
+            Figure::Colors opponentColor = (turn == Figure::white) ? Figure::black : Figure::white;
+            if (isCheckmate(chessBoard, opponentColor))
             {
-                mBoard = history[history.size() - 1];
-                check = true;
-                break;
+                end = true;
+                return true;
             }
-            if (turn == Figure::white)
-            {
-                if (isCheckmate(mBoard, Figure::black))
-                {
-                    end[0] = true;
-                    return true;
-                }
+           if(isKingInCheck(chessBoard,turn))
+           {
+               chessBoard = history[history.size() - 1];
+               check = true;
+               break;             
             }
-            else {
-                if (isCheckmate(mBoard, Figure::white))
-                {
-                    end[0] = true;
-                    return true;
-                }
-            }
+
             if (!check)
             {
-                if (mBoard.arr[req.X][req.Y].figure == Figure::King)
+                if (chessBoard.arr[req.X][req.Y].figure == Figure::King)
                 {
                     if (turn == Figure::white)
                     {
@@ -612,7 +557,7 @@ bool chessBoard::playMove(move req,int replace[],bool end[])
                         bKing_moved = true;
                     }
                 }
-                if (mBoard.arr[req.X][req.Y].figure == Figure::Rook)
+                if (chessBoard.arr[req.X][req.Y].figure == Figure::Rook)
 				{
 					if (turn)
 					{
@@ -637,7 +582,7 @@ bool chessBoard::playMove(move req,int replace[],bool end[])
 						}
 					}
 				}
-                history.push_back(mBoard);
+                history.push_back(chessBoard);
                 return true;
             }
         }

@@ -8,6 +8,9 @@ struct move
     int oX, oY, X, Y;
     move() {}
     move(int oldX, int oldY, int newX, int newY);
+    bool operator==(const move& other) const {
+        return (X == other.X) && (Y == other.Y) && (oX==other.oX) == (oY==other.oY);
+    }
 };
 
 struct Figure {
@@ -25,14 +28,7 @@ struct Figure {
 
 struct board
 {
-    /*int arr[8][8] = {{7, 6, -1, -1, -1, -1, 0, 1},
-                     {8, 6, -1, -1, -1, -1, 0, 2},
-                     {9, 6, -1, -1, -1, -1, 0, 3},
-                     {11, 6, -1, -1, -1, -1, 0, 5},
-                     {10, 6, -1, -1, -1, -1, 0, 4},
-                     {9, 6, -1, -1, -1, -1, 0, 3},
-                     {8, 6, -1, -1, -1, -1, 0, 2},
-                     {7, 6, -1, -1, -1, -1, 0, 1} };*/
+
         Figure arr[8][8] = {
             {{Figure::Rook, Figure::black}, {Figure::Pawn, Figure::black}, {Figure::Empty, Figure::none}, {Figure::Empty, Figure::none}, {Figure::Empty, Figure::none}, {Figure::Empty, Figure::none}, {Figure::Pawn, Figure::white}, {Figure::Rook, Figure::white}},
             {{Figure::Knight, Figure::black}, {Figure::Pawn, Figure::black}, {Figure::Empty, Figure::none}, {Figure::Empty, Figure::none}, {Figure::Empty, Figure::none}, {Figure::Empty, Figure::none}, {Figure::Pawn, Figure::white}, {Figure::Knight, Figure::white}},
@@ -58,23 +54,23 @@ struct board
 class chessBoard {
 private: 
 
-    const char* notation(int x, int y);
+   
     std::vector<board> history;
 
-    void Pawn(std::vector<move>& moves, int x, int y); // potezi za bijelog pijuna
-    void King(std::vector<move>& moves, int x, int y); // potezi za kralja
-    void Rook(std::vector<move>& moves, int x, int y); // potezi za topa
-    void Queen(std::vector<move>& moves, int x, int y); // potezi za topa
-    void Bishop(std::vector<move>& moves, int x, int y); // potezi za topa
-    void Knight(std::vector<move>& moves, int x, int y); // potezi za topa
+    void Pawn(board Board, std::vector<move>& moves, int x, int y); // potezi za bijelog pijuna
+    void King(board Board, std::vector<move>& moves, int x, int y); // potezi za kralja
+    void Rook(board Board, std::vector<move>& moves, int x, int y); // potezi za topa
+    void Queen(board Board, std::vector<move>& moves, int x, int y); // potezi za topa
+    void Bishop(board Board, std::vector<move>& moves, int x, int y); // potezi za topa
+    void Knight(board Board, std::vector<move>& moves, int x, int y); // potezi za topa
     std::vector<move> getLegalMoves(board b, Figure::Colors color); // dohvaća sve legalne poteze za određenu boju
     bool isKingInCheck(board b, Figure::Colors color); // provjerava je li kralj u šahu
     bool isSquareUnderAttack(int x, int y); // provjerava je li polje pod napadom
     bool isCheckmate(board b, Figure::Colors turn);
-
+    bool wKing_moved, bKing_moved, wRook1_moved, wRook2_moved, bRook1_moved, bRook2_moved = false;
 public:
     Figure::Colors turn = Figure::white;
-    board mBoard;
-    bool playMove(move req,int replace[],bool end[]); // izvršava potez
+    board chessBoard;
+    bool playMove(move req,int replace[],bool& end,bool& rotation); // izvršava potez
     void nextTurn(); // prebacuje na sljedeći potez
 };    

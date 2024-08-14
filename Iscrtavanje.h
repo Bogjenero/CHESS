@@ -22,11 +22,11 @@ private:
 	
 	sf::RenderWindow win; // prozor
 	sf::RectangleShape button; // button
-	sf::RectangleShape Squares[8][8]; //šahovska ploča
+	sf::RectangleShape boardSquares[8][8]; //šahovska ploča
 	sf::IntRect Holder; // pravokutnik za šahovsku ploču
-	sf::Color sColors[2]; // boje za polja
+	sf::Color playerColors[2]; // boje za polja
 	sf::Texture pieceTex[12]; // figure (bijele,crne)
-	chessPiece pieces[64]; // figure
+	chessPiece chessPieces[64]; // figure
 	int selected[2]; // odabrana figura
 	bool cSelect = 0; // jel odabrana figura
 	int sX, sY; // x,y koordinate
