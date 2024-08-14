@@ -46,6 +46,7 @@ private:
 	void handleClosed(); // Nova funkcija za rukovanje zatvaranjem prozora
 	void showEndWindow();
 	void resetGame();
+	void drawVictoryWindow(Figure::Colors turn);
 public:
 	chessBoard cBoard; //šahovska ploča
 	bool Update();// rukuje događajima koji su izvedeni na prozoru
@@ -53,26 +54,3 @@ public:
 
 };
 
-/*class Button {
-private:
-	sf::RectangleShape button;
-	sf::Text text;
-	sf::Font font;
-public:
-	Button(std::string s,sf::Vector2f size,sf::Color bgColor,sf::Color textColor) {
-		text.setString(s);
-		text.setColor(textColor);
-
-		button.setSize(size);
-		button.setFillColor(bgColor);
-
-	}
-	void setPosition(sf::Vector2f pos) {
-		float xPos = (pos.x - button.getGlobalBounds().width / 2) - (text.getGlobalBounds().width/2);
-		float yPos = (pos.y - button.getGlobalBounds().width / 2) - (text.getGlobalBounds().width/2);
-		button.setPosition(xPos, yPos);
-	}
-
-
-
-};*/

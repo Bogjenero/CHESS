@@ -2,6 +2,7 @@
 #include "Iscrtavanje.h"
 #include <iostream>
 #include <SFML/Graphics.hpp>
+#include "Board.h"
 
 const std::string defaultTheme[12] = {
                                 "./images/Pieces/Default/wp.png",
@@ -266,10 +267,30 @@ void chessWin::handleMouseButtonPressed(sf::Event& event) {
                     cSelect = 0;
                 }
                 else {
+
                     move m(selected[0], selected[1], projX, projY);
-                    if (cBoard.playMove(m)) {
-                        MapPieces(m);
-                        cBoard.nextTurn();
+                    int replace[5] = {0,0,0,0,0};
+                    bool end[] = { false };
+                    if (cBoard.playMove(m,replace,end)) {
+                        if(replace[0] == 1)
+						{
+							 MapPieces(m);
+                              move m2 = move(replace[1], replace[2], replace[3], replace[4]);
+                              MapPieces(m2);
+                              cBoard.nextTurn();
+						}
+                        else {
+                            MapPieces(m);
+                            if (end[0]) {
+                                DrawSquares();
+                                DrawPieces();
+                                win.display();
+                                drawVictoryWindow(cBoard.turn);
+                            }
+                            else {
+                                cBoard.nextTurn();
+                            }
+                        }
                     }
                     Squares[selected[0]][selected[1]].setFillColor(sColors[1 - ((selected[0] + selected[1]) % 2)]);
                     cSelect = 0;
@@ -289,14 +310,14 @@ void chessWin::handleClosed() {
 
 
 void chessWin::resetGame() {
-    // Resetiranje ploče na početno stanje
+    
     for (int i = 0; i < 8; ++i) {
         for (int j = 0; j < 8; ++j) {
             cBoard.mBoard.arr[i][j] = cBoard.mBoard.start[i][j];
         }
     }
 
-    // Ponovno učitavanje slika figura prema početnom stanju
+    
     int index = 0;
     for (int i = 0; i < 8; ++i) {
         for (int j = 0; j < 8; ++j) {
@@ -318,7 +339,7 @@ void chessWin::resetGame() {
         }
     }
 
-    // Ažuriraj prikaz figura
+   
     MapPieces();
     FitToHolder();
 }
@@ -361,25 +382,28 @@ void chessWin::showEndWindow()
                 {
                     sf::Vector2i mousePos = sf::Mouse::getPosition(endWindow);
                     if (button.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
-                        // Zatvori trenutni prozor igre
+                        
                         win.close();
 
-                        // Resetiraj igru
+                        
                         resetGame();
 
-                        // Postavi stanje igre na početni ekran
+                       
                         state = GameState::StartScreen;
-
-                        // Ponovno otvorite glavni prozor igre
+                        if(cBoard.turn == Figure::black)
+						{
+							cBoard.nextTurn();
+						}   
+                       
                         win.create(sf::VideoMode(sX, sY), "chess");
 
-                        // Inicijalizacija i prikaz početnog ekrana
+                      
                         FitToHolder();
                         MapPieces();
                         DrawSquares();
                         DrawPieces();
 
-                        // Izađite iz petlje
+                        
                         return;
                     }
                 }
@@ -392,6 +416,102 @@ void chessWin::showEndWindow()
         endWindow.display();
     }
 }
+
+
+void chessWin::drawVictoryWindow(Figure::Colors turn) {
+
+    sf::RenderWindow Victorywindow(sf::VideoMode(400, 200), "Victory!");
+
+
+    sf::Font font;
+    if (!font.loadFromFile("C:\\Windows\\Fonts\\arial.ttf")) {
+        return;
+    }
+
+    sf::Text text;
+    text.setFont(font);
+    text.setCharacterSize(24);
+    text.setFillColor(sf::Color::White);
+    text.setStyle(sf::Text::Bold);
+
+    std::string s;
+    if(turn == Figure::white) {
+		s = "white";
+	}
+	else {
+		s = "black";
+	}
+    std::string message = "The color " + s + " has won!";
+    text.setString(message);
+
+    sf::FloatRect textRect = text.getLocalBounds();
+    text.setOrigin(textRect.left + textRect.width / 2.0f,
+        textRect.top + textRect.height / 2.0f);
+    text.setPosition(sf::Vector2f(Victorywindow.getSize().x / 2.0f,
+        Victorywindow.getSize().y / 2.0f - 20.0f));
+
+    sf::RectangleShape button(sf::Vector2f(100, 50));
+    button.setFillColor(sf::Color::Green);
+    button.setOutlineColor(sf::Color::Black);
+    button.setOutlineThickness(2);
+    button.setPosition(Victorywindow.getSize().x / 2.0f - 50, Victorywindow.getSize().y / 2.0f + 20);
+
+    sf::Text buttonText;
+    buttonText.setFont(font);
+    buttonText.setCharacterSize(18);
+    buttonText.setFillColor(sf::Color::Black);
+    buttonText.setStyle(sf::Text::Bold);
+    buttonText.setString("OK");
+    buttonText.setOrigin(buttonText.getLocalBounds().left + buttonText.getLocalBounds().width / 2.0f,
+        buttonText.getLocalBounds().top + buttonText.getLocalBounds().height / 2.0f);
+    buttonText.setPosition(button.getPosition().x + button.getSize().x / 2.0f,
+        button.getPosition().y + button.getSize().y / 2.0f);
+
+    while (Victorywindow.isOpen()) {
+        sf::Event event;
+        while (Victorywindow.pollEvent(event)) {
+            if (event.type == sf::Event::Closed)
+                Victorywindow.close();
+            else if (event.type == sf::Event::MouseButtonPressed)
+            {
+                if (event.mouseButton.button == sf::Mouse::Left)
+                {
+                    sf::Vector2i mousePos = sf::Mouse::getPosition(Victorywindow);
+                    if (button.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
+
+                        win.close();
+
+
+                        resetGame();
+
+
+                        state = GameState::StartScreen;
+
+                        win.create(sf::VideoMode(sX, sY), "chess");
+
+
+                        FitToHolder();
+                        MapPieces();
+                        DrawSquares();
+                        DrawPieces();
+
+
+                        return;
+                    }
+                }
+            }
+
+        }
+        Victorywindow.clear();
+
+        Victorywindow.draw(text);
+        Victorywindow.draw(button);
+        Victorywindow.draw(buttonText);
+
+        Victorywindow.display();
+    }
+}
+
 
 
 
@@ -413,7 +533,7 @@ bool chessWin::Update() {
             handleClosed();
             return false;
 
-            // Možeš dodati druge evente ovdje, ako su potrebni
+            
 
         case sf::Event::KeyPressed:
             if (event.key.code == sf::Keyboard::Escape && state == GameState::ChessBoard)
