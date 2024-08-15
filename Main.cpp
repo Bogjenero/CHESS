@@ -7,7 +7,8 @@
 #include <time.h>
 #include <iostream>
 #include <fstream>
-
+#include <windows.h>
+#include "resource.h"
 #include "Iscrtavanje.h"
 using namespace sf;
 
@@ -31,8 +32,9 @@ int main()
 
 
 
-
-	chessWin window(800, 800, "chess", defaultTheme);
+	char chess[10];
+	LoadStringA(GetModuleHandle(NULL), CHESS, chess, sizeof(chess));
+	chessWin window(800, 800, chess, defaultTheme);
 
 	while (window.Update())
 	{

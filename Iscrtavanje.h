@@ -6,7 +6,7 @@
 #include <SFML/System.hpp>
 #include <SFML/Window/Event.hpp>
 #include "Board.h"
-
+#include <array>
 
 struct chessPiece {
 	sf::Sprite Sprite; // prikazuje vizualni prikaz figure
@@ -23,18 +23,17 @@ private:
 	sf::RenderWindow win; // prozor
 	sf::RectangleShape button; // button
 	sf::RectangleShape boardSquares[8][8]; //šahovska ploča
-	sf::IntRect Holder; // pravokutnik za šahovsku ploču
-	sf::Color playerColors[2]; // boje za polja
+	sf::IntRect Holder; // pravokutnik za šahovsku ploča
+	std::array<sf::Color,2> fieldColors = { sf::Color(118, 150, 86) ,sf::Color(255, 255, 255) }; // boje za polja // MORA BITI ARRY NE CEOVSKO POLJE
 	sf::Texture pieceTex[12]; // figure (bijele,crne)
 	chessPiece chessPieces[64]; // figure
-	int selected[2]; // odabrana figura
-	bool cSelect = 0; // jel odabrana figura
+	std::array<int,2> selected; // odabrana figura
+	int selectedFigures = 0; // jel odabrana figura
 	int sX, sY; // x,y koordinate
 	sf::Text buttonText; // tekst na gumbu
 	sf::Font font; // font za tekst
 	GameState state;
 
-	//sf::Sound sounds[4];
 	void FitToHolder(); // prilagođava veličinu i poziciju kvadrata na šahovskoj ploči prema veličini pravokutnika
 	void DrawSquares(); // crta kvadrate na šahovskoj ploči
 	void DrawPieces(); // crta figure

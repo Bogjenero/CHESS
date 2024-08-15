@@ -1,10 +1,8 @@
-﻿
-#include <vector>
+﻿#include <vector>
 #include "Board.h"
 #include <iostream>
 #include <algorithm>
-
-
+#include <array>
 
 move::move(int oldX, int oldY, int newX, int newY)
 {
@@ -14,7 +12,7 @@ move::move(int oldX, int oldY, int newX, int newY)
     Y = newY;
 }
 
-void chessBoard::Pawn(board Board,std::vector<move>& moves, int x, int y)
+void chessBoard::Pawn(board& Board,std::vector<move>& moves, int x, int y)
 {
     if (Board.arr[x][y].figure == Figure::Pawn && Board.arr[x][y].color == turn)
     {
@@ -49,14 +47,15 @@ void chessBoard::Pawn(board Board,std::vector<move>& moves, int x, int y)
     }
 }
 
-void chessBoard::King(board Board, std::vector<move>& moves, int x, int y)
+void chessBoard::King(board& Board, std::vector<move>& moves, int x, int y)
 {
 
     if (Board.arr[x][y].figure != Figure::King)
         return;
-    
-        int dx[] = { -1, -1, -1, 0, 0, 1, 1, 1, -3,2 };
-        int dy[] = { -1, 0, 1, -1, 1, -1, 0, 1, 0,0};
+   
+        std::array<int, 8> dx = { -1, -1, -1, 0, 0, 1, 1, 1, };
+        std::array<int, 8> dy = { -1, 0, 1, -1, 1, -1,0 , 1,};
+
 
         for (int i = 0; i < 8; ++i)
         {
@@ -98,14 +97,15 @@ void chessBoard::King(board Board, std::vector<move>& moves, int x, int y)
 }
 
 
-void chessBoard::Knight(board Board, std::vector<move>& moves, int x, int y)
+void chessBoard::Knight(board& Board, std::vector<move>& moves, int x, int y)
 {
 
     if (Board.arr[x][y].figure != Figure::Knight)
         return;
 
-        int dx[] = { -2, -1, 1, 2, 2, 1, -1, -2 };
-        int dy[] = { 1, 2, 2, 1, -1, -2, -2, -1 };
+
+        std::array<int, 8> dx = { -2, -1, 1, 2, 2, 1, -1, -2 };
+        std::array<int, 8> dy = { 1, 2, 2, 1, -1, -2, -2, -1 };
 
         for (int i = 0; i < 8; ++i)
         {
@@ -124,14 +124,14 @@ void chessBoard::Knight(board Board, std::vector<move>& moves, int x, int y)
         }
 }
 
-void chessBoard::Rook(board Board, std::vector<move>& moves, int x, int y)
+void chessBoard::Rook(board& Board, std::vector<move>& moves, int x, int y)
 {
 
     if (Board.arr[x][y].figure != Figure::Rook)
         return;
 
-        int dx[] = { 1, -1, 0, 0 };
-        int dy[] = { 0, 0, 1, -1 };
+        std::array<int, 4> dx = { 1, -1, 0, 0 };
+        std::array<int, 4> dy = { 0, 0, 1, -1 };
 
         for (int i = 0; i < 4; ++i)
         {
@@ -168,13 +168,15 @@ void chessBoard::Rook(board Board, std::vector<move>& moves, int x, int y)
 
 
 
-void chessBoard::Bishop(board Board, std::vector<move>& moves, int x, int y)
+void chessBoard::Bishop(board& Board, std::vector<move>& moves, int x, int y)
 {
 
     if (Board.arr[x][y].figure != Figure::Bishop)
         return;
-        int dx[] = { 1, 1, -1, -1 };
-        int dy[] = { 1, -1, 1, -1 };
+
+        std::array<int, 4> dx = { 1, 1, -1, -1 };
+        std::array<int, 4> dy = { 1, -1, 1, -1 };
+
 
         for (int i = 0; i < 4; ++i)
         {
@@ -208,7 +210,7 @@ void chessBoard::Bishop(board Board, std::vector<move>& moves, int x, int y)
         }
     }
 
-void chessBoard::Queen(board Board, std::vector<move>& moves, int x, int y)
+void chessBoard::Queen(board& Board, std::vector<move>& moves, int x, int y)
 {
 
     if (Board.arr[x][y].figure != Figure::Queen)
@@ -307,7 +309,6 @@ std::vector<move> chessBoard::getLegalMoves(board b, Figure::Colors color)
                 else if (b.arr[i][j].figure == Figure::King && b.arr[i][j].color == color)
                 {
                     King(b,moves, i, j);
-                    b.arr[i][j].hasMoved = true;
                 }
                 if (b.arr[i][j].figure == Figure::Knight && b.arr[i][j].color == color)
                 {
@@ -316,7 +317,6 @@ std::vector<move> chessBoard::getLegalMoves(board b, Figure::Colors color)
                 else if (b.arr[i][j].figure == Figure::Rook && b.arr[i][j].color == color)
                 {
                     Rook(b,moves, i, j);
-                    b.arr[i][j].hasMoved = true;
                 }
                 else if (b.arr[i][j].figure == Figure::Bishop && b.arr[i][j].color == color)
                 {
@@ -356,15 +356,9 @@ bool chessBoard::isKingInCheck(board b,Figure::Colors color)
     {
 		 opponentMoves = getLegalMoves(b, Figure::white);
 	}
-
-    bool kingInCheck = false;
-    std::for_each(opponentMoves.begin(), opponentMoves.end(), [&](const move& m) {
-        if (m.X == kingX && m.Y == kingY) {
-            kingInCheck = true; 
-        }
+    return !std::all_of(opponentMoves.begin(), opponentMoves.end(), [&](const move& m) {
+        return m.X != kingX || m.Y != kingY;
         });
-
-    return kingInCheck;
 }
 
 bool chessBoard::isCheckmate(board b, Figure::Colors color) {
@@ -375,23 +369,14 @@ bool chessBoard::isCheckmate(board b, Figure::Colors color) {
 
     std::vector<move> allPossibleMoves = getLegalMoves(b, color);
 
-    bool isCheckmate = true;
-
-    std::for_each(allPossibleMoves.begin(), allPossibleMoves.end(), [&](const move& m) {
+    return std::none_of(allPossibleMoves.begin(), allPossibleMoves.end(), [&](const move& m) {
         board tempBoard = b;
-
-        
         tempBoard.arr[m.X][m.Y] = tempBoard.arr[m.oX][m.oY];
-        tempBoard.arr[m.oX][m.oY] = { Figure::Empty, Figure::none };
+        tempBoard.arr[m.oX][m.oY] = { Figure::Empty, Figure::none };       
+        return !isKingInCheck(tempBoard, color);
+        });
 
-        
-        if (!isKingInCheck(tempBoard, color)) {
-            isCheckmate = false;
-        }
-    });
-
-    
-    return isCheckmate;
+ 
 }
 
 
@@ -406,31 +391,16 @@ bool chessBoard::isSquareUnderAttack(int x, int y)
     }
     if (turn == Figure::white) {
         std::vector<move> moves = getLegalMoves(chessBoard, Figure::black);
-        for (const auto& m : moves)
-        {
-            if (m.X == x && m.Y == y)
-            {
-                return false;
-            }
-        }
-        std::for_each(moves.begin(), moves.end(), [&](const auto& m) {
-            if (m.X == x && m.Y == y)
-            {
-                return false;
-            }
+        return std::all_of(moves.begin(), moves.end(), [x, y](const move& m) {
+            return !(m.X == x && m.Y == y);
             });
     }
     else {
         std::vector<move> moves = getLegalMoves(chessBoard, Figure::white);
-        for (const auto& m : moves)
-        {
-            if (m.X == x && m.Y == y)
-            {
-                return false;
-            }
-        }
+        return std::all_of(moves.begin(), moves.end(), [x, y](const move& m) {
+            return !(m.X == x && m.Y == y);
+            });
     }
-
     return true;
 }
 
@@ -443,7 +413,7 @@ bool chessBoard::isSquareUnderAttack(int x, int y)
 
 
 
-bool chessBoard::playMove(move req,int replace[],bool& end,bool& rotation)
+bool chessBoard::playMove(move req, std::array<int,4>& replace,bool& end,bool& rotation)
 {
 
  
@@ -559,7 +529,7 @@ bool chessBoard::playMove(move req,int replace[],bool& end,bool& rotation)
                 }
                 if (chessBoard.arr[req.X][req.Y].figure == Figure::Rook)
 				{
-					if (turn)
+					if (turn == Figure::white)
 					{
 						if (req.oX == 0 && req.oY == 7)
 						{
