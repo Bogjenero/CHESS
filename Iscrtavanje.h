@@ -6,6 +6,7 @@
 #include <SFML/System.hpp>
 #include <SFML/Window/Event.hpp>
 #include "Board.h"
+#include <windows.h>
 #include <array>
 
 struct chessPiece {
@@ -46,10 +47,11 @@ private:
 	void showEndWindow();
 	void resetGame();
 	void drawVictoryWindow(Figure::Colors turn);
+	
 public:
 	chessBoard cBoard; //šahovska ploča
 	bool Update();// rukuje događajima koji su izvedeni na prozoru
 	chessWin(int width, int height, const char* name, const std::string imgPath[12]); 
-
+	std::wstring load_string(HINSTANCE hInstance, UINT uID);
 };
 

@@ -10,9 +10,8 @@
 #include <windows.h>
 #include "resource.h"
 #include "Iscrtavanje.h"
+
 using namespace sf;
-
-
 int main()
 {
 
@@ -33,7 +32,7 @@ int main()
 
 
 	char chess[10];
-	LoadStringA(GetModuleHandle(NULL), CHESS, chess, sizeof(chess));
+	LoadStringA(GetModuleHandle(nullptr), CHESS, chess, sizeof(chess));
 	chessWin window(800, 800, chess, defaultTheme);
 
 	while (window.Update())

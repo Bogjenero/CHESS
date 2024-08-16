@@ -22,3 +22,4 @@
 #define CHESS 230
 #define FINISH 240
 #define ENDWINDOW 250
+#define OK 260

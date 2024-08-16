@@ -6,6 +6,23 @@
 #include "resource.h"
 #include <windows.h>
 #include <windowsx.h>
+
+std::wstring chessWin::load_string(HINSTANCE hInstance, UINT uID) {
+    
+    const int maxBufferSize = 128;
+    wchar_t buffer[maxBufferSize];
+
+    int length = LoadStringW(hInstance, uID, buffer, maxBufferSize);
+    if (length == 0) {
+        return L"";
+    }
+    return std::wstring(buffer);
+}
+
+
+
+
+
 const std::string defaultTheme[12] = {
                                 "./images/Pieces/Default/wp.png",
                             "./images/Pieces/Default/wr.png",
@@ -72,11 +89,11 @@ void chessWin::MapPieces(move curr)
     {
         if (chessPieces[i].draw == 1)
         {
-            if (chessPieces[i].x == curr.oX && chessPieces[i].y == curr.oY)
+            if (chessPieces[i].x == curr.from.x && chessPieces[i].y == curr.from.y)
             {
                 current = &chessPieces[i];
             }
-            if (chessPieces[i].x == curr.X && chessPieces[i].y == curr.Y)
+            if (chessPieces[i].x == curr.to.x && chessPieces[i].y == curr.to.y)
             {
                 chessPieces[i].draw = 0;
                 capture = true;
@@ -85,8 +102,8 @@ void chessWin::MapPieces(move curr)
             chessPieces[i].Sprite.setScale(Holder.width / 1600.f, Holder.height / 1600.f);
         }
     }
-    current->x = curr.X;
-    current->y = curr.Y;
+    current->x = curr.to.x;
+    current->y = curr.to.y;
 
     current->Sprite.setPosition(sf::Vector2f(Holder.left + (current->x * Holder.width / 8), Holder.top + (current->y * Holder.height / 8)));
     current->Sprite.setScale(Holder.width / 1600.f, Holder.height / 1600.f);
@@ -164,14 +181,9 @@ chessWin::chessWin(int width, int height, const char* name, const std::string im
     button.setPosition(300, 350);
     button.setFillColor(sf::Color::Blue);
     
-    
-    char start[10];
-    LoadStringA(GetModuleHandle(NULL), START, start, sizeof(start));
-
-   
     font.loadFromFile("arial.ttf");
     buttonText.setFont(font);
-    buttonText.setString(start);
+    buttonText.setString(load_string(GetModuleHandle(nullptr), START));
     buttonText.setCharacterSize(30);
     buttonText.setFillColor(sf::Color::White);
 
@@ -265,7 +277,7 @@ void chessWin::handleMouseButtonPressed(sf::Event& event) {
                 }
                 else {
 
-                    move m(selected[0], selected[1], projX, projY);
+                    move m(Point(selected[0], selected[1]),Point( projX, projY));
                     std::array<int, 4> replace = { 0,0,0,0 };
                     bool rotation = false;
                     bool end = false;
@@ -274,7 +286,7 @@ void chessWin::handleMouseButtonPressed(sf::Event& event) {
                         if(rotation)
 						{
 							 MapPieces(m);
-                              move m2 = move(replace[0], replace[1], replace[2], replace[3]);
+                              move m2 = move(Point(replace[0], replace[1]),Point( replace[2], replace[3]));
                               MapPieces(m2);
                               cBoard.nextTurn();
 						}
@@ -309,9 +321,6 @@ void chessWin::handleClosed() {
 
 
 void chessWin::resetGame() {
-    
-
-
     cBoard.chessBoard.arr[0][0] = { Figure::Rook, Figure::black };
     cBoard.chessBoard.arr[1][0] = { Figure::Knight, Figure::black };
     cBoard.chessBoard.arr[2][0] = { Figure::Bishop, Figure::black };
@@ -336,14 +345,11 @@ void chessWin::resetGame() {
     for (int i = 0; i < 8; ++i) {
         cBoard.chessBoard.arr[i][6] = { Figure::Pawn, Figure::white };
     }
-
-
     for (int i = 2; i < 6; ++i) {
         for (int j = 0; j < 8; ++j) {
             cBoard.chessBoard.arr[j][i] = { Figure::Empty, Figure::none };
         }
     }
-   
     int index = 0;
     for (int i = 0; i < 8; ++i) {
         for (int j = 0; j < 8; ++j) {
@@ -364,8 +370,6 @@ void chessWin::resetGame() {
             ++index;
         }
     }
-
-   
     MapPieces();
     FitToHolder();
 }
@@ -373,31 +377,22 @@ void chessWin::resetGame() {
 
 void chessWin::showEndWindow()
 {
-    
-    char end[15];
-    LoadStringA(GetModuleHandle(NULL), ENDWINDOW, end, sizeof(end));
-    sf::RenderWindow endWindow(sf::VideoMode(400, 200), end);
-
-    
+    sf::RenderWindow endWindow(sf::VideoMode(400, 200), load_string(GetModuleHandle(nullptr), ENDWINDOW));
+  
     sf::RectangleShape button(sf::Vector2f(250, 50));
     button.setFillColor(sf::Color::Green);
     button.setPosition(100, 75);
 
-    
     sf::Font font;
     if (!font.loadFromFile("arial.ttf")) 
     {
         return; 
     }
 
-    char finish[30];
-    LoadStringA(GetModuleHandle(NULL), FINISH, finish, sizeof(finish));
-
-    sf::Text buttonText(finish, font, 24);
+    sf::Text buttonText(load_string(GetModuleHandle(nullptr), FINISH), font, 24);
     buttonText.setFillColor(sf::Color::White);
     buttonText.setPosition(150, 85); 
-
-   
+       
     while (endWindow.isOpen())
     {
         sf::Event event;
@@ -425,11 +420,8 @@ void chessWin::showEndWindow()
 						{
 							cBoard.nextTurn();
 						}   
-                        char chess[10];
-                        LoadStringA(GetModuleHandle(NULL), CHESS, chess, sizeof(chess));
-                        win.create(sf::VideoMode(sX, sY), chess);
-
-                      
+                        win.create(sf::VideoMode(sX, sY), load_string(GetModuleHandle(nullptr), CHESS));
+                  
                         FitToHolder();
                         MapPieces();
                         DrawSquares();
@@ -441,7 +433,6 @@ void chessWin::showEndWindow()
                 }
             }
         }
-
         endWindow.clear();
         endWindow.draw(button);
         endWindow.draw(buttonText);
@@ -450,34 +441,20 @@ void chessWin::showEndWindow()
 }
 
 
-void chessWin::drawVictoryWindow(Figure::Colors turn) {
-
-    char victory[128];
-    LoadStringA(GetModuleHandle(NULL), WHITE_WON, victory, sizeof(victory));
-
-    sf::RenderWindow Victorywindow(sf::VideoMode(400, 200), victory);
-
-
+void chessWin::drawVictoryWindow(Figure::Colors turn) 
+{
+    sf::RenderWindow Victorywindow(sf::VideoMode(400, 200), load_string(GetModuleHandle(nullptr), VICTORY));
     sf::Font font;
     if (!font.loadFromFile("arial.ttf")) {
         return;
     }
-
     sf::Text text;
     text.setFont(font);
     text.setCharacterSize(24);
     text.setFillColor(sf::Color::White);
     text.setStyle(sf::Text::Bold);
 
-    char s[128];
-    if(turn == Figure::white) {
-        LoadStringA(GetModuleHandle(NULL), WHITE_WON, s, sizeof(s));
-	}
-	else {
-        LoadStringA(GetModuleHandle(NULL), BLACK_WON, s, sizeof(s));
-	}
-    
-    text.setString(s);
+    text.setString(load_string(GetModuleHandle(nullptr), (turn == Figure::white) ? WHITE_WON : BLACK_WON));
     sf::FloatRect textRect = text.getLocalBounds();
     text.setOrigin(textRect.left + textRect.width / 2.0f,
         textRect.top + textRect.height / 2.0f);
@@ -495,11 +472,12 @@ void chessWin::drawVictoryWindow(Figure::Colors turn) {
     buttonText.setCharacterSize(18);
     buttonText.setFillColor(sf::Color::Black);
     buttonText.setStyle(sf::Text::Bold);
-    buttonText.setString("OK");
+
+    buttonText.setString(load_string(GetModuleHandle(nullptr), OK));
     buttonText.setOrigin(buttonText.getLocalBounds().left + buttonText.getLocalBounds().width / 2.0f,
-        buttonText.getLocalBounds().top + buttonText.getLocalBounds().height / 2.0f);
+    buttonText.getLocalBounds().top + buttonText.getLocalBounds().height / 2.0f);
     buttonText.setPosition(button.getPosition().x + button.getSize().x / 2.0f,
-        button.getPosition().y + button.getSize().y / 2.0f);
+    button.getPosition().y + button.getSize().y / 2.0f);
 
     while (Victorywindow.isOpen()) {
         sf::Event event;
@@ -518,18 +496,13 @@ void chessWin::drawVictoryWindow(Figure::Colors turn) {
 
                         resetGame();
 
-
                         state = GameState::StartScreen;
-                        char chess[10];
-                        LoadStringA(GetModuleHandle(NULL), CHESS, chess, sizeof(chess));
-                        win.create(sf::VideoMode(sX, sY), chess);
-
+                        win.create(sf::VideoMode(sX, sY), load_string(GetModuleHandle(nullptr), CHESS));
 
                         FitToHolder();
                         MapPieces();
                         DrawSquares();
                         DrawPieces();
-
 
                         return;
                     }
@@ -547,10 +520,6 @@ void chessWin::drawVictoryWindow(Figure::Colors turn) {
     }
 }
 
-
-
-
-
 bool chessWin::Update() {
     sf::Event event;
     while (win.pollEvent(event)) {
@@ -567,8 +536,6 @@ bool chessWin::Update() {
         case sf::Event::Closed:
             handleClosed();
             return false;
-
-            
 
         case sf::Event::KeyPressed:
             if (event.key.code == sf::Keyboard::Escape && state == GameState::ChessBoard)
