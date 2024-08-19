@@ -7,8 +7,9 @@
 #include <windows.h>
 #include <windowsx.h>
 
-std::wstring chessWin::load_string(HINSTANCE hInstance, UINT uID) {
-    
+std::wstring chessWin::load_string(UINT uID) {
+    HMODULE hInstance = GetModuleHandle(nullptr);
+
     const int maxBufferSize = 128;
     wchar_t buffer[maxBufferSize];
 
@@ -167,8 +168,11 @@ int setTexture(Figure currFigure)
 
     }
 }
+chessWin::chessWin() {
 
-chessWin::chessWin(int width, int height, const char* name, const std::string imgPath[12])
+}
+
+chessWin::chessWin(int width, int height, std::wstring name, const std::string imgPath[12])
 {
     state = GameState::StartScreen;
     sX = width;
@@ -183,7 +187,7 @@ chessWin::chessWin(int width, int height, const char* name, const std::string im
     
     font.loadFromFile("arial.ttf");
     buttonText.setFont(font);
-    buttonText.setString(load_string(GetModuleHandle(nullptr), START));
+    buttonText.setString(load_string(START));
     buttonText.setCharacterSize(30);
     buttonText.setFillColor(sf::Color::White);
 
@@ -377,7 +381,7 @@ void chessWin::resetGame() {
 
 void chessWin::showEndWindow()
 {
-    sf::RenderWindow endWindow(sf::VideoMode(400, 200), load_string(GetModuleHandle(nullptr), ENDWINDOW));
+    sf::RenderWindow endWindow(sf::VideoMode(400, 200), load_string(ENDWINDOW));
   
     sf::RectangleShape button(sf::Vector2f(250, 50));
     button.setFillColor(sf::Color::Green);
@@ -389,7 +393,7 @@ void chessWin::showEndWindow()
         return; 
     }
 
-    sf::Text buttonText(load_string(GetModuleHandle(nullptr), FINISH), font, 24);
+    sf::Text buttonText(load_string(FINISH), font, 24);
     buttonText.setFillColor(sf::Color::White);
     buttonText.setPosition(150, 85); 
        
@@ -420,7 +424,7 @@ void chessWin::showEndWindow()
 						{
 							cBoard.nextTurn();
 						}   
-                        win.create(sf::VideoMode(sX, sY), load_string(GetModuleHandle(nullptr), CHESS));
+                        win.create(sf::VideoMode(sX, sY), load_string(CHESS));
                   
                         FitToHolder();
                         MapPieces();
@@ -443,7 +447,7 @@ void chessWin::showEndWindow()
 
 void chessWin::drawVictoryWindow(Figure::Colors turn) 
 {
-    sf::RenderWindow Victorywindow(sf::VideoMode(400, 200), load_string(GetModuleHandle(nullptr), VICTORY));
+    sf::RenderWindow Victorywindow(sf::VideoMode(400, 200), load_string(VICTORY));
     sf::Font font;
     if (!font.loadFromFile("arial.ttf")) {
         return;
@@ -454,7 +458,7 @@ void chessWin::drawVictoryWindow(Figure::Colors turn)
     text.setFillColor(sf::Color::White);
     text.setStyle(sf::Text::Bold);
 
-    text.setString(load_string(GetModuleHandle(nullptr), (turn == Figure::white) ? WHITE_WON : BLACK_WON));
+    text.setString(load_string((turn == Figure::white) ? WHITE_WON : BLACK_WON));
     sf::FloatRect textRect = text.getLocalBounds();
     text.setOrigin(textRect.left + textRect.width / 2.0f,
         textRect.top + textRect.height / 2.0f);
@@ -473,7 +477,7 @@ void chessWin::drawVictoryWindow(Figure::Colors turn)
     buttonText.setFillColor(sf::Color::Black);
     buttonText.setStyle(sf::Text::Bold);
 
-    buttonText.setString(load_string(GetModuleHandle(nullptr), OK));
+    buttonText.setString(load_string(OK));
     buttonText.setOrigin(buttonText.getLocalBounds().left + buttonText.getLocalBounds().width / 2.0f,
     buttonText.getLocalBounds().top + buttonText.getLocalBounds().height / 2.0f);
     buttonText.setPosition(button.getPosition().x + button.getSize().x / 2.0f,
@@ -497,7 +501,7 @@ void chessWin::drawVictoryWindow(Figure::Colors turn)
                         resetGame();
 
                         state = GameState::StartScreen;
-                        win.create(sf::VideoMode(sX, sY), load_string(GetModuleHandle(nullptr), CHESS));
+                        win.create(sf::VideoMode(sX, sY), load_string(CHESS));
 
                         FitToHolder();
                         MapPieces();

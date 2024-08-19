@@ -51,7 +51,8 @@ private:
 public:
 	chessBoard cBoard; //šahovska ploča
 	bool Update();// rukuje događajima koji su izvedeni na prozoru
-	chessWin(int width, int height, const char* name, const std::string imgPath[12]); 
-	std::wstring load_string(HINSTANCE hInstance, UINT uID);
+	chessWin(int width, int height, std::wstring name, const std::string imgPath[12]);
+	chessWin();
+	std::wstring load_string(UINT uID);
 };
 

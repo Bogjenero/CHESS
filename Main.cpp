@@ -11,6 +11,8 @@
 #include "resource.h"
 #include "Iscrtavanje.h"
 
+
+
 using namespace sf;
 int main()
 {
@@ -28,12 +30,8 @@ int main()
 								"./images/Pieces/Default/bb.png",
 								"./images/Pieces/Default/bk.png",
 								"./images/Pieces/Default/bq.png" };
-
-
-
-	char chess[10];
-	LoadStringA(GetModuleHandle(nullptr), CHESS, chess, sizeof(chess));
-	chessWin window(800, 800, chess, defaultTheme);
+	chessWin temp;
+	chessWin window(800, 800, temp.load_string(CHESS), defaultTheme);
 
 	while (window.Update())
 	{

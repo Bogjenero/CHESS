@@ -3,6 +3,8 @@
 #include <iostream>
 #include <algorithm>
 #include <array>
+
+
 void chessBoard::Pawn(const board& Board,std::vector<move>& moves, const Point& position)
 {
     if (Board.arr[position.x][position.y].figure == Figure::Pawn && Board.arr[position.x][position.y].color == turn)
@@ -80,8 +82,6 @@ void chessBoard::King(const board& Board, std::vector<move>& moves, const Point&
         }
     }
 }
-
-
 
 void chessBoard::Knight(const board& Board, std::vector<move>& moves, const Point& position)
 {
