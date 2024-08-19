@@ -37,7 +37,19 @@ void chessBoard::Pawn(const board& Board,std::vector<move>& moves, const Point& 
                 moves.push_back(move(Point(position.x, position.y),Point(position.x + 1, position.y + direction)));
             }
         }
+        if (enPassantPossible) {
+            if (position.y == (turn == Figure::white ? 3 : 4)) {
+                if (position.x > 0 && enPassantTarget == Point(position.x - 1, position.y + direction)) {
+                moves.push_back(move(Point(position.x, position.y), Point(position.x - 1, position.y + direction)));
+                }
+                if (position.x < 7 && enPassantTarget == Point(position.x + 1, position.y + direction)) {
+                moves.push_back(move(Point(position.x, position.y), Point(position.x + 1, position.y + direction)));
+                }
+        }
     }
+
+    }
+
 }
 void chessBoard::King(const board& Board, std::vector<move>& moves, const Point& position)
 {
@@ -65,9 +77,9 @@ void chessBoard::King(const board& Board, std::vector<move>& moves, const Point&
         {
             moves.push_back(move(position, Point(position.x + 2, position.y)));
         }
-        if (position.x - 3 >= 0 && Board.arr[position.x - 3][position.y].figure == Figure::Empty && Board.arr[position.x - 1][position.y].figure == Figure::Empty && Board.arr[position.x - 2][position.y].figure == Figure::Empty)
+        if (position.x - 2 >= 0 && Board.arr[position.x - 2][position.y].figure == Figure::Empty && Board.arr[position.x - 1][position.y].figure == Figure::Empty)
         {
-            moves.push_back(move(position, Point(position.x - 3, position.y)));
+            moves.push_back(move(position, Point(position.x - 2, position.y)));
         }
     }
     else if (Board.arr[position.x][position.y].color == Figure::black && !bKing_moved)
@@ -76,11 +88,12 @@ void chessBoard::King(const board& Board, std::vector<move>& moves, const Point&
         {
             moves.push_back(move(position, Point(position.x + 2, position.y)));
         }
-        if (position.x - 3 >= 0 && Board.arr[position.x - 3][position.y].figure == Figure::Empty && Board.arr[position.x - 1][position.y].figure == Figure::Empty && Board.arr[position.x - 2][position.y].figure == Figure::Empty)
+        if (Board.arr[position.x - 1][position.y].figure == Figure::Empty && Board.arr[position.x - 2][position.y].figure == Figure::Empty)
         {
-            moves.push_back(move(position, Point(position.x - 3, position.y)));
+            moves.push_back(move(position, Point(position.x -2, position.y)));
         }
     }
+
 }
 
 void chessBoard::Knight(const board& Board, std::vector<move>& moves, const Point& position)
@@ -317,8 +330,8 @@ bool chessBoard::isSquareUnderAttack(const Point& p) {
         });
 }
 
-bool chessBoard::playMove(move req, std::array<int,4>& replace,bool& end,bool& rotation)
-{
+bool chessBoard::playMove(move req, std::array<int,4>& replace,bool& end,bool& rotation,Point& enPassantPawn,bool& Passant)
+{   
     std::vector<move> moves = getLegalMoves(chessBoard, turn);
     move temp;
     for (int i = 0; i < moves.size(); ++i)
@@ -326,6 +339,25 @@ bool chessBoard::playMove(move req, std::array<int,4>& replace,bool& end,bool& r
         temp = moves[i];
         if (req==moves[i])
         {
+            if (chessBoard.arr[req.from.x][req.from.y].figure == Figure::Pawn && req.to == enPassantTarget)
+			{
+                int direction = (turn == Figure::white) ? 1 : -1;
+
+                chessBoard.arr[req.to.x][req.to.y] = chessBoard.arr[req.from.x][req.from.y];
+                chessBoard.arr[req.from.x][req.from.y] = { Figure::Empty, Figure::none };
+                chessBoard.arr[req.to.x][req.to.y + direction] = { Figure::Empty, Figure::none };
+                enPassantPawn = Point(req.to.x, req.to.y + direction);
+                Passant = true;
+			}
+            if (chessBoard.arr[req.from.x][req.from.y].figure == Figure::Pawn && abs(req.to.y - req.from.y) == 2) {
+                enPassantPossible = true;
+                enPassantTarget = Point(req.from.x, req.from.y + (turn == Figure::white ? -1 : 1));
+            }
+            else {
+                enPassantPossible = false;
+
+            }
+
             if (chessBoard.arr[req.from.x][req.from.y].figure == Figure::King && chessBoard.arr[req.from.x][req.from.y].color == Figure::white && req.from.x + 2 == temp.to.x && !wKing_moved && !wRook2_moved)
             {
                 if (isSquareUnderAttack(Point(req.from.x + 2, req.from.y)) && isSquareUnderAttack(Point(req.from.x + 1, req.from.y)))
@@ -343,18 +375,17 @@ bool chessBoard::playMove(move req, std::array<int,4>& replace,bool& end,bool& r
                     return false;
                 }
             }
-
-            else if (chessBoard.arr[req.from.x][req.from.y].figure == Figure::King && chessBoard.arr[req.from.x][req.from.y].color == Figure::white && req.from.x - 3 == temp.to.x && !wKing_moved && !wRook1_moved)
+            else if (chessBoard.arr[req.from.x][req.from.y].figure == Figure::King && chessBoard.arr[req.from.x][req.from.y].color == Figure::white && req.from.x - 2 == temp.to.x && !wKing_moved && !wRook1_moved)
             {
                 if(isSquareUnderAttack(Point(req.from.x-3, req.from.y)) && isSquareUnderAttack(Point(req.from.x-2, req.from.y)) && isSquareUnderAttack(Point(req.from.x-1, req.from.y)))
                 {
                     chessBoard.arr[req.to.x][req.to.y] = chessBoard.arr[req.from.x][req.from.y];
                     chessBoard.arr[req.from.x][req.from.y].figure = Figure::Empty;
-                    chessBoard.arr[2][7] = chessBoard.arr[0][7];
+                    chessBoard.arr[3][7] = chessBoard.arr[0][7];
                     chessBoard.arr[0][7].figure = Figure::Empty;
                     wKing_moved = true;
                     wRook1_moved = true;
-                    replace[0] = 0, replace[1] = 7, replace[2] = 2, replace[3] = 7;
+                    replace[0] = 0, replace[1] = 7, replace[2] = 3, replace[3] = 7;
                     rotation = true;
                 }
                 else {
@@ -378,17 +409,17 @@ bool chessBoard::playMove(move req, std::array<int,4>& replace,bool& end,bool& r
                     return false;
                 }
             }
-            else if (chessBoard.arr[req.from.x][req.from.y].figure == Figure::King && chessBoard.arr[req.from.x][req.from.y].color == Figure::black && req.from.x - 3 == temp.to.x && !bKing_moved && !wRook2_moved)
+            else if (chessBoard.arr[req.from.x][req.from.y].figure == Figure::King && chessBoard.arr[req.from.x][req.from.y].color == Figure::black && req.from.x - 2 == temp.to.x && !bKing_moved && !wRook2_moved)
             {
                 if (isSquareUnderAttack(Point(req.from.x - 3, req.from.y)) && isSquareUnderAttack(Point(req.from.x - 2, req.from.y)) && isSquareUnderAttack(Point(req.from.x-3, req.from.y)))
                 {
                     chessBoard.arr[req.to.x][req.to.y] = chessBoard.arr[req.from.x][req.from.y];
                     chessBoard.arr[req.from.x][req.from.y].figure = Figure::Empty;                   
-                    chessBoard.arr[2][0] = chessBoard.arr[0][0];
+                    chessBoard.arr[3][0] = chessBoard.arr[0][0];
                     chessBoard.arr[0][0].figure = Figure::Empty;
                     bKing_moved = true;
                     bRook2_moved = true;
-                    replace[0] = 0, replace[1] = 0, replace[2] = 2, replace[3] = 0;
+                    replace[0] = 0, replace[1] = 0, replace[2] = 3, replace[3] = 0;
                     rotation = true;
                 }
                 else {
@@ -396,6 +427,13 @@ bool chessBoard::playMove(move req, std::array<int,4>& replace,bool& end,bool& r
                 }
             }
             else {
+                if (chessBoard.arr[req.from.x][req.from.y].figure == Figure::Pawn && abs(req.to.y - req.from.y) == 2) {
+                    enPassantPossible = true;
+                    enPassantTarget = Point(req.from.x, req.from.y + (turn == Figure::white ? -1 : 1));
+                }
+                else {
+                    enPassantPossible = false;
+                }
                 chessBoard.arr[req.to.x][req.to.y] = chessBoard.arr[req.from.x][req.from.y];
                 chessBoard.arr[req.from.x][req.from.y].figure = Figure::Empty;
             }
@@ -412,8 +450,6 @@ bool chessBoard::playMove(move req, std::array<int,4>& replace,bool& end,bool& r
                 end = true;
                 return true;
             }
-
-
             if (!check)
             {
                 if (chessBoard.arr[req.to.x][req.to.y].figure == Figure::King)
@@ -462,4 +498,7 @@ void chessBoard::nextTurn()
 	{
 		turn = Figure::white;
 	}
+    if (!enPassantPossible) {
+        enPassantTarget = Point(-1, -1);
+    }
 }

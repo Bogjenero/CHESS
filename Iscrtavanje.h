@@ -47,7 +47,7 @@ private:
 	void showEndWindow();
 	void resetGame();
 	void drawVictoryWindow(Figure::Colors turn);
-	
+	void RemovePieceAt(const Point& position);
 public:
 	chessBoard cBoard; //šahovska ploča
 	bool Update();// rukuje događajima koji su izvedeni na prozoru

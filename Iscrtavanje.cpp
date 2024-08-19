@@ -109,6 +109,33 @@ void chessWin::MapPieces(move curr)
     current->Sprite.setPosition(sf::Vector2f(Holder.left + (current->x * Holder.width / 8), Holder.top + (current->y * Holder.height / 8)));
     current->Sprite.setScale(Holder.width / 1600.f, Holder.height / 1600.f);
 }
+void chessWin::RemovePieceAt(const Point& position)
+{
+    // Prolazimo kroz sve figure na tabli
+    for (int i = 0; i < 64; ++i)
+    {
+        // Ako je figura vidljiva
+        if (chessPieces[i].draw == 1)
+        {
+            // Ako figura odgovara poziciji koju treba ukloniti
+            if (chessPieces[i].x == position.x && chessPieces[i].y == position.y)
+            {
+                // Postavi oznaku figure na nulti, što znači da je uklonjena
+                chessPieces[i].draw = 0;
+
+                // Ažuriraj poziciju sprite-a figure (sada se neće prikazivati jer je draw = 0)
+                chessPieces[i].Sprite.setPosition(sf::Vector2f(
+                    Holder.left + (chessPieces[i].x * Holder.width / 8),
+                    Holder.top + (chessPieces[i].y * Holder.height / 8)
+                ));
+                chessPieces[i].Sprite.setScale(Holder.width / 1600.f, Holder.height / 1600.f);
+
+                // Izlazi iz petlje jer smo već uklonili odgovarajuću figuru
+                return;
+            }
+        }
+    }
+}
 
 
 int setTexture(Figure currFigure)
@@ -285,15 +312,21 @@ void chessWin::handleMouseButtonPressed(sf::Event& event) {
                     std::array<int, 4> replace = { 0,0,0,0 };
                     bool rotation = false;
                     bool end = false;
-
-                    if (cBoard.playMove(m,replace,end,rotation)) {
+                    bool Passant = false;
+                    Point enPassantPawn;
+                    if (cBoard.playMove(m,replace,end,rotation,enPassantPawn,Passant)) {
                         if(rotation)
 						{
-							 MapPieces(m);
+							  MapPieces(m);
                               move m2 = move(Point(replace[0], replace[1]),Point( replace[2], replace[3]));
                               MapPieces(m2);
                               cBoard.nextTurn();
 						}
+                        else if (Passant) {
+                            MapPieces(m);
+                            RemovePieceAt(enPassantPawn);
+                            cBoard.nextTurn();
+                        }
                         else {
                             MapPieces(m);
                             if (end) {
@@ -374,6 +407,7 @@ void chessWin::resetGame() {
             ++index;
         }
     }
+    cBoard.bKing_moved = false, cBoard.wKing_moved = false, cBoard.bRook1_moved = false, cBoard.bRook2_moved = false, cBoard.wRook1_moved = false, cBoard.wRook2_moved = false;
     MapPieces();
     FitToHolder();
 }
@@ -383,6 +417,8 @@ void chessWin::showEndWindow()
 {
     sf::RenderWindow endWindow(sf::VideoMode(400, 200), load_string(ENDWINDOW));
   
+    win.setActive(false);
+
     sf::RectangleShape button(sf::Vector2f(250, 50));
     button.setFillColor(sf::Color::Green);
     button.setPosition(100, 75);
@@ -437,11 +473,17 @@ void chessWin::showEndWindow()
                 }
             }
         }
+        if (!endWindow.hasFocus())
+        {
+            endWindow.requestFocus();
+        }
+
         endWindow.clear();
         endWindow.draw(button);
         endWindow.draw(buttonText);
         endWindow.display();
     }
+    win.setActive(true);
 }
 
 
@@ -527,6 +569,7 @@ void chessWin::drawVictoryWindow(Figure::Colors turn)
 bool chessWin::Update() {
     sf::Event event;
     while (win.pollEvent(event)) {
+
 
         switch (event.type) {
         case sf::Event::Resized:

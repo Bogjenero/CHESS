@@ -67,10 +67,13 @@ private:
     bool isKingInCheck(const board& b, Figure::Colors color); // provjerava je li kralj u šahu
     bool isSquareUnderAttack(const Point& p); // provjerava je li polje pod napadom
     bool isCheckmate(const board& b, Figure::Colors turn);
-    bool wKing_moved = false,bKing_moved = false, wRook1_moved = false, wRook2_moved = false, bRook1_moved = false, bRook2_moved = false;
+    bool enPassantPossible = false;
+    Point enPassantTarget;
+    Point enPassantPawn;
 public:
+    bool wKing_moved = false, bKing_moved = false, wRook1_moved = false, wRook2_moved = false, bRook1_moved = false, bRook2_moved = false;
     Figure::Colors turn = Figure::white;
     board chessBoard;
-    bool playMove(move req,std::array<int,4>& replace,bool& end,bool& rotation); // izvršava potez
+    bool playMove(move req,std::array<int,4>& replace,bool& end,bool& rotation,Point& enPassantPawn,bool& Passant); // izvršava potez
     void nextTurn(); // prebacuje na sljedeći potez
 };    
