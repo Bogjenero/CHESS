@@ -111,26 +111,24 @@ void chessWin::MapPieces(move curr)
 }
 void chessWin::RemovePieceAt(const Point& position)
 {
-    // Prolazimo kroz sve figure na tabli
+    
     for (int i = 0; i < 64; ++i)
     {
-        // Ako je figura vidljiva
+        
         if (chessPieces[i].draw == 1)
         {
-            // Ako figura odgovara poziciji koju treba ukloniti
+            
             if (chessPieces[i].x == position.x && chessPieces[i].y == position.y)
             {
-                // Postavi oznaku figure na nulti, što znači da je uklonjena
+                
                 chessPieces[i].draw = 0;
 
-                // Ažuriraj poziciju sprite-a figure (sada se neće prikazivati jer je draw = 0)
+                
                 chessPieces[i].Sprite.setPosition(sf::Vector2f(
                     Holder.left + (chessPieces[i].x * Holder.width / 8),
                     Holder.top + (chessPieces[i].y * Holder.height / 8)
                 ));
                 chessPieces[i].Sprite.setScale(Holder.width / 1600.f, Holder.height / 1600.f);
-
-                // Izlazi iz petlje jer smo već uklonili odgovarajuću figuru
                 return;
             }
         }
